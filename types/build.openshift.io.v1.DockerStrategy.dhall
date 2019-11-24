@@ -1,0 +1,1 @@
+{ from : { kind : Text, name : Text } }

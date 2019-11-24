@@ -1,0 +1,2143 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"bodhi","service":"web"},"name":"bodhi-web","namespace":"bodhi"},"spec":{"ports":[{"name":"web","port":8080,"targetPort":8080}],"selector":{"deploymentconfig":"bodhi-web"}}}
+    creationTimestamp: 2018-09-11T01:53:26Z
+    labels:
+      app: bodhi
+      service: web
+    name: bodhi-web
+    namespace: bodhi
+    resourceVersion: "33655"
+    selfLink: /api/v1/namespaces/bodhi/services/bodhi-web
+    uid: 795ff258-b565-11e8-a45f-525400254f6b
+  spec:
+    clusterIP: 172.30.218.80
+    ports:
+    - name: web
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: bodhi-web
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","metadata":{"annotations":{},"labels":{"app":"bodhi","service":"celery"},"name":"bodhi-celery","namespace":"bodhi"},"spec":{"replicas":1,"selector":{"deploymentconfig":"bodhi-celery"},"strategy":{"activeDeadlineSeconds":21600,"recreateParams":{"timeoutSeconds":600},"resources":{},"rollingParams":{"intervalSeconds":1,"maxSurge":"25%","maxUnavailable":"25%","timeoutSeconds":600,"updatePeriodSeconds":1},"type":"Rolling"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"bodhi-celery","deploymentconfig":"bodhi-celery"}},"spec":{"containers":[{"image":"bodhi-celery:latest","name":"bodhi-celery","resources":{},"volumeMounts":[{"mountPath":"/etc/bodhi","name":"config-volume","readOnly":true},{"mountPath":"/etc/keytabs","name":"keytab-volume","readOnly":true},{"mountPath":"/etc/fedora-messaging","name":"fedora-messaging-config-volume","readOnly":true},{"mountPath":"/etc/pki/fedora-messaging/cacert.pem","name":"fedora-messaging-ca-volume","readOnly":true,"subPath":"cacert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-cert.pem","name":"fedora-messaging-crt-volume","readOnly":true,"subPath":"bodhi-cert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-key.pem","name":"fedora-messaging-key-volume","readOnly":true,"subPath":"bodhi-key.pem"}]}],"volumes":[{"configMap":{"name":"bodhi-configmap"},"name":"config-volume"},{"name":"keytab-volume","secret":{"secretName":"bodhi-keytab"}},{"configMap":{"name":"fedora-messaging-configmap"},"name":"fedora-messaging-config-volume"},{"name":"fedora-messaging-ca-volume","secret":{"secretName":"bodhi-fedora-messaging-ca"}},{"name":"fedora-messaging-crt-volume","secret":{"secretName":"bodhi-fedora-messaging-crt"}},{"name":"fedora-messaging-key-volume","secret":{"secretName":"bodhi-fedora-messaging-key"}}]}},"triggers":[{"imageChangeParams":{"automatic":true,"containerNames":["bodhi-celery"],"from":{"kind":"ImageStreamTag","name":"bodhi-celery:latest","namespace":"bodhi"}},"type":"ImageChange"},{"type":"ConfigChange"}]}}
+    creationTimestamp: 2019-10-09T12:19:12Z
+    generation: 45
+    labels:
+      app: bodhi
+      service: celery
+    name: bodhi-celery
+    namespace: bodhi
+    resourceVersion: "110242397"
+    selfLink: /apis/apps.openshift.io/v1/namespaces/bodhi/deploymentconfigs/bodhi-celery
+    uid: 00eb1505-ea8f-11e9-ac9b-525400deded5
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-celery
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: bodhi-celery
+          deploymentconfig: bodhi-celery
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:11a75975064928c52f8ca8ed0a66458047623efc4049dfba27227ab8f9ad7b21
+          imagePullPolicy: Always
+          name: bodhi-celery
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-celery
+        from:
+          kind: ImageStreamTag
+          name: bodhi-celery:latest
+          namespace: bodhi
+        lastTriggeredImage: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:11a75975064928c52f8ca8ed0a66458047623efc4049dfba27227ab8f9ad7b21
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    availableReplicas: 0
+    conditions:
+    - lastTransitionTime: 2019-11-04T14:59:55Z
+      lastUpdateTime: 2019-11-04T14:59:57Z
+      message: replication controller "bodhi-celery-44" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: 2019-11-06T11:44:35Z
+      lastUpdateTime: 2019-11-06T11:44:35Z
+      message: Deployment config does not have minimum availability.
+      status: "False"
+      type: Available
+    details:
+      causes:
+      - imageTrigger:
+          from:
+            kind: DockerImage
+            name: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:11a75975064928c52f8ca8ed0a66458047623efc4049dfba27227ab8f9ad7b21
+        type: ImageChange
+      message: image change
+    latestVersion: 44
+    observedGeneration: 45
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","metadata":{"annotations":{},"labels":{"app":"bodhi","service":"consumer"},"name":"bodhi-consumer","namespace":"bodhi"},"spec":{"replicas":1,"selector":{"deploymentconfig":"bodhi-consumer"},"strategy":{"activeDeadlineSeconds":21600,"recreateParams":{"timeoutSeconds":600},"resources":{},"rollingParams":{"intervalSeconds":1,"maxSurge":"25%","maxUnavailable":"25%","timeoutSeconds":600,"updatePeriodSeconds":1},"type":"Rolling"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"bodhi-consumer","deploymentconfig":"bodhi-consumer"}},"spec":{"containers":[{"image":"bodhi-consumer:latest","name":"bodhi-consumer","resources":{},"volumeMounts":[{"mountPath":"/etc/bodhi","name":"config-volume","readOnly":true},{"mountPath":"/etc/keytabs","name":"keytab-volume","readOnly":true},{"mountPath":"/etc/fedora-messaging","name":"fedora-messaging-config-volume","readOnly":true},{"mountPath":"/etc/pki/fedora-messaging/cacert.pem","name":"fedora-messaging-ca-volume","readOnly":true,"subPath":"cacert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-cert.pem","name":"fedora-messaging-crt-volume","readOnly":true,"subPath":"bodhi-cert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-key.pem","name":"fedora-messaging-key-volume","readOnly":true,"subPath":"bodhi-key.pem"}]}],"volumes":[{"configMap":{"name":"bodhi-configmap"},"name":"config-volume"},{"name":"keytab-volume","secret":{"secretName":"bodhi-keytab"}},{"configMap":{"name":"fedora-messaging-configmap"},"name":"fedora-messaging-config-volume"},{"name":"fedora-messaging-ca-volume","secret":{"secretName":"bodhi-fedora-messaging-ca"}},{"name":"fedora-messaging-crt-volume","secret":{"secretName":"bodhi-fedora-messaging-crt"}},{"name":"fedora-messaging-key-volume","secret":{"secretName":"bodhi-fedora-messaging-key"}}]}},"triggers":[{"imageChangeParams":{"automatic":true,"containerNames":["bodhi-consumer"],"from":{"kind":"ImageStreamTag","name":"bodhi-consumer:latest","namespace":"bodhi"}},"type":"ImageChange"},{"type":"ConfigChange"}]}}
+    creationTimestamp: 2019-05-15T18:25:27Z
+    generation: 167
+    labels:
+      app: bodhi
+      service: consumer
+    name: bodhi-consumer
+    namespace: bodhi
+    resourceVersion: "110242400"
+    selfLink: /apis/apps.openshift.io/v1/namespaces/bodhi/deploymentconfigs/bodhi-consumer
+    uid: d04d3118-773e-11e9-808f-525400deded5
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-consumer
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: bodhi-consumer
+          deploymentconfig: bodhi-consumer
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+          imagePullPolicy: Always
+          name: bodhi-consumer
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-consumer
+        from:
+          kind: ImageStreamTag
+          name: bodhi-consumer:latest
+          namespace: bodhi
+        lastTriggeredImage: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    availableReplicas: 0
+    conditions:
+    - lastTransitionTime: 2019-11-04T14:59:33Z
+      lastUpdateTime: 2019-11-04T14:59:36Z
+      message: replication controller "bodhi-consumer-158" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: 2019-11-06T11:44:35Z
+      lastUpdateTime: 2019-11-06T11:44:35Z
+      message: Deployment config does not have minimum availability.
+      status: "False"
+      type: Available
+    details:
+      causes:
+      - imageTrigger:
+          from:
+            kind: DockerImage
+            name: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+        type: ImageChange
+      message: image change
+    latestVersion: 158
+    observedGeneration: 167
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","metadata":{"annotations":{},"labels":{"app":"bodhi","service":"web"},"name":"bodhi-web","namespace":"bodhi"},"spec":{"replicas":1,"selector":{"deploymentconfig":"bodhi-web"},"strategy":{"activeDeadlineSeconds":21600,"recreateParams":{"timeoutSeconds":600},"resources":{},"rollingParams":{"intervalSeconds":1,"maxSurge":"25%","maxUnavailable":"25%","timeoutSeconds":600,"updatePeriodSeconds":1},"type":"Rolling"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"bodhi-web","deploymentconfig":"bodhi-web"}},"spec":{"containers":[{"image":"bodhi-web:latest","livenessProbe":{"httpGet":{"path":"/","port":8080},"initialDelaySeconds":30,"timeoutSeconds":10},"name":"bodhi-web","ports":[{"containerPort":8080}],"readinessProbe":{"httpGet":{"path":"/","port":8080},"initialDelaySeconds":5,"timeoutSeconds":10},"resources":{},"volumeMounts":[{"mountPath":"/etc/bodhi","name":"config-volume","readOnly":true},{"mountPath":"/etc/keytabs","name":"keytab-volume","readOnly":true},{"mountPath":"/httpdir","name":"httpdir-volume"},{"mountPath":"/etc/fedora-messaging","name":"fedora-messaging-config-volume","readOnly":true},{"mountPath":"/etc/pki/fedora-messaging/cacert.pem","name":"fedora-messaging-ca-volume","readOnly":true,"subPath":"cacert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-cert.pem","name":"fedora-messaging-crt-volume","readOnly":true,"subPath":"bodhi-cert.pem"},{"mountPath":"/etc/pki/fedora-messaging/bodhi-key.pem","name":"fedora-messaging-key-volume","readOnly":true,"subPath":"bodhi-key.pem"}]}],"volumes":[{"configMap":{"name":"bodhi-configmap"},"name":"config-volume"},{"name":"keytab-volume","secret":{"secretName":"bodhi-keytab"}},{"emptyDir":{},"name":"httpdir-volume"},{"configMap":{"name":"fedora-messaging-configmap"},"name":"fedora-messaging-config-volume"},{"name":"fedora-messaging-ca-volume","secret":{"secretName":"bodhi-fedora-messaging-ca"}},{"name":"fedora-messaging-crt-volume","secret":{"secretName":"bodhi-fedora-messaging-crt"}},{"name":"fedora-messaging-key-volume","secret":{"secretName":"bodhi-fedora-messaging-key"}}]}},"triggers":[{"imageChangeParams":{"automatic":true,"containerNames":["bodhi-web"],"from":{"kind":"ImageStreamTag","name":"bodhi-web:latest","namespace":"bodhi"}},"type":"ImageChange"},{"type":"ConfigChange"}]}}
+    creationTimestamp: 2018-09-11T01:53:29Z
+    generation: 440
+    labels:
+      app: bodhi
+      service: web
+    name: bodhi-web
+    namespace: bodhi
+    resourceVersion: "110242399"
+    selfLink: /apis/apps.openshift.io/v1/namespaces/bodhi/deploymentconfigs/bodhi-web
+    uid: 7b00a112-b565-11e8-8be3-525400deded5
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-web
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: bodhi-web
+          deploymentconfig: bodhi-web
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: bodhi-web
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /httpdir
+            name: httpdir-volume
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - emptyDir: {}
+          name: httpdir-volume
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-web
+        from:
+          kind: ImageStreamTag
+          name: bodhi-web:latest
+          namespace: bodhi
+        lastTriggeredImage: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    availableReplicas: 0
+    conditions:
+    - lastTransitionTime: 2019-11-04T15:00:51Z
+      lastUpdateTime: 2019-11-04T15:00:56Z
+      message: replication controller "bodhi-web-337" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: 2019-11-06T11:44:35Z
+      lastUpdateTime: 2019-11-06T11:44:35Z
+      message: Deployment config does not have minimum availability.
+      status: "False"
+      type: Available
+    details:
+      causes:
+      - imageTrigger:
+          from:
+            kind: DockerImage
+            name: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+        type: ImageChange
+      message: image change
+    latestVersion: 337
+    observedGeneration: 440
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","metadata":{"annotations":{},"labels":{"build":"bodhi-base"},"name":"bodhi-base","namespace":"bodhi"},"spec":{"output":{"to":{"kind":"ImageStreamTag","name":"bodhi-base:latest"}},"runPolicy":"Serial","source":{"dockerfile":"FROM fedora:30\nLABEL \\\n  name=\"bodhi-base\" \\\n  vendor=\"Fedora Infrastructure\" \\\n  license=\"MIT\"\nRUN curl -o /etc/yum.repos.d/infra-tags-stg.repo https://infrastructure.fedoraproject.org/cgit/ansible.git/plain/files/common/fedora-infra-tags-stg.repo\n# While dnf has a --nodocs, it doesen't have a --docs...\nRUN sed -i '/nodocs/d' /etc/dnf/dnf.conf\nRUN dnf install -y \\\n    git                         \\\n    python3-pip                 \\\n    fedora-messaging            \\\n    httpd                       \\\n    intltool                    \\\n    python3-alembic             \\\n    python3-arrow               \\\n    python3-backoff             \\\n    python3-bleach              \\\n    python3-celery              \\\n    python3-click               \\\n    python3-colander            \\\n    python3-cornice             \\\n    python3-dogpile-cache       \\\n    python3-fedora-messaging    \\\n    python3-feedgen             \\\n    python3-jinja2              \\\n    python3-markdown            \\\n    python3-psycopg2            \\\n    python3-py3dns              \\\n    python3-pyasn1-modules      \\\n    python3-pylibravatar        \\\n    python3-pyramid             \\\n    python3-pyramid-fas-openid  \\\n    python3-pyramid-mako        \\\n    python3-bugzilla            \\\n    python3-fedora              \\\n    python3-pyyaml              \\\n    python3-simplemediawiki     \\\n    python3-sqlalchemy          \\\n    python3-waitress            \\\n    python3-dnf                 \\\n    python3-koji                \\\n    python3-librepo             \\\n    python3-mod_wsgi            \\\n    koji \u0026\u0026 \\\n    dnf clean all\n\nRUN git clone -b 5.0 https://github.com/fedora-infra/bodhi.git /srv/bodhi \u0026\u0026 \\\n    cd /srv/bodhi \u0026\u0026 \\\n    python3 -m pip install . --no-use-pep517 \u0026\u0026 \\\n    mkdir -p /usr/share/bodhi \u0026\u0026 \\\n    cp /srv/bodhi/apache/bodhi.wsgi /usr/share/bodhi/bodhi.wsgi\n\n# Set up krb5\nRUN rm -f /etc/krb5.conf \u0026\u0026 \\\n    ln -sf /etc/bodhi/krb5.conf /etc/krb5.conf \u0026\u0026 \\\n    ln -sf /etc/keytabs/koji-keytab /etc/krb5.bodhi_bodhi.stg.fedoraproject.org.keytab\nENV USER=openshift","type":"Dockerfile"},"strategy":{"dockerStrategy":{"noCache":false},"type":"Docker"}}}
+    creationTimestamp: 2019-05-15T18:47:06Z
+    labels:
+      build: bodhi-base
+    name: bodhi-base
+    namespace: bodhi
+    resourceVersion: "109749362"
+    selfLink: /apis/build.openshift.io/v1/namespaces/bodhi/buildconfigs/bodhi-base
+    uid: d690777f-7741-11e9-808f-525400deded5
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: bodhi-base:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |-
+        FROM fedora:30
+        LABEL \
+          name="bodhi-base" \
+          vendor="Fedora Infrastructure" \
+          license="MIT"
+        RUN curl -o /etc/yum.repos.d/infra-tags-stg.repo https://infrastructure.fedoraproject.org/cgit/ansible.git/plain/files/common/fedora-infra-tags-stg.repo
+        # While dnf has a --nodocs, it doesen't have a --docs...
+        RUN sed -i '/nodocs/d' /etc/dnf/dnf.conf
+        RUN dnf install -y \
+            git                         \
+            python3-pip                 \
+            fedora-messaging            \
+            httpd                       \
+            intltool                    \
+            python3-alembic             \
+            python3-arrow               \
+            python3-backoff             \
+            python3-bleach              \
+            python3-celery              \
+            python3-click               \
+            python3-colander            \
+            python3-cornice             \
+            python3-dogpile-cache       \
+            python3-fedora-messaging    \
+            python3-feedgen             \
+            python3-jinja2              \
+            python3-markdown            \
+            python3-psycopg2            \
+            python3-py3dns              \
+            python3-pyasn1-modules      \
+            python3-pylibravatar        \
+            python3-pyramid             \
+            python3-pyramid-fas-openid  \
+            python3-pyramid-mako        \
+            python3-bugzilla            \
+            python3-fedora              \
+            python3-pyyaml              \
+            python3-simplemediawiki     \
+            python3-sqlalchemy          \
+            python3-waitress            \
+            python3-dnf                 \
+            python3-koji                \
+            python3-librepo             \
+            python3-mod_wsgi            \
+            koji && \
+            dnf clean all
+
+        RUN git clone -b 5.0 https://github.com/fedora-infra/bodhi.git /srv/bodhi && \
+            cd /srv/bodhi && \
+            python3 -m pip install . --no-use-pep517 && \
+            mkdir -p /usr/share/bodhi && \
+            cp /srv/bodhi/apache/bodhi.wsgi /usr/share/bodhi/bodhi.wsgi
+
+        # Set up krb5
+        RUN rm -f /etc/krb5.conf && \
+            ln -sf /etc/bodhi/krb5.conf /etc/krb5.conf && \
+            ln -sf /etc/keytabs/koji-keytab /etc/krb5.bodhi_bodhi.stg.fedoraproject.org.keytab
+        ENV USER=openshift
+      type: Dockerfile
+    strategy:
+      dockerStrategy: {}
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers: []
+  status:
+    lastVersion: 101
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","metadata":{"annotations":{},"labels":{"build":"bodhi-celery"},"name":"bodhi-celery","namespace":"bodhi"},"spec":{"output":{"to":{"kind":"ImageStreamTag","name":"bodhi-celery:latest"}},"runPolicy":"Serial","source":{"dockerfile":"FROM bodhi-base\nLABEL \\\n  name=\"bodhi-celery\" \\\n  vendor=\"Fedora Infrastructure\" \\\n  license=\"MIT\"\nENTRYPOINT /usr/bin/celery worker -A bodhi.server.tasks.app -l info -Q celery","type":"Dockerfile"},"strategy":{"dockerStrategy":{"from":{"kind":"ImageStreamTag","name":"bodhi-base:latest"},"noCache":false},"type":"Docker"},"triggers":[{"imageChange":{},"type":"imageChange"}]}}
+    creationTimestamp: 2019-10-09T12:19:01Z
+    labels:
+      build: bodhi-celery
+    name: bodhi-celery
+    namespace: bodhi
+    resourceVersion: "109750341"
+    selfLink: /apis/build.openshift.io/v1/namespaces/bodhi/buildconfigs/bodhi-celery
+    uid: f9f406e1-ea8e-11e9-a596-525400dd984d
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: bodhi-celery:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |-
+        FROM bodhi-base
+        LABEL \
+          name="bodhi-celery" \
+          vendor="Fedora Infrastructure" \
+          license="MIT"
+        ENTRYPOINT /usr/bin/celery worker -A bodhi.server.tasks.app -l info -Q celery
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: bodhi-base:latest
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:124185d5694a6926cc79965803db1ee1a4217ad6855281bcbf63027f97bc4c89
+      type: ImageChange
+  status:
+    lastVersion: 26
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","metadata":{"annotations":{},"labels":{"build":"bodhi-consumer"},"name":"bodhi-consumer","namespace":"bodhi"},"spec":{"output":{"to":{"kind":"ImageStreamTag","name":"bodhi-consumer:latest"}},"runPolicy":"Serial","source":{"dockerfile":"FROM bodhi-base\nLABEL \\\n  name=\"bodhi-consumer\" \\\n  vendor=\"Fedora Infrastructure\" \\\n  license=\"MIT\"\nENTRYPOINT /usr/bin/fedora-messaging consume","type":"Dockerfile"},"strategy":{"dockerStrategy":{"from":{"kind":"ImageStreamTag","name":"bodhi-base:latest"},"noCache":false},"type":"Docker"},"triggers":[{"imageChange":{},"type":"imageChange"}]}}
+    creationTimestamp: 2019-05-15T18:25:21Z
+    labels:
+      build: bodhi-consumer
+    name: bodhi-consumer
+    namespace: bodhi
+    resourceVersion: "109750340"
+    selfLink: /apis/build.openshift.io/v1/namespaces/bodhi/buildconfigs/bodhi-consumer
+    uid: cccc8339-773e-11e9-808f-525400deded5
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: bodhi-consumer:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |-
+        FROM bodhi-base
+        LABEL \
+          name="bodhi-consumer" \
+          vendor="Fedora Infrastructure" \
+          license="MIT"
+        ENTRYPOINT /usr/bin/fedora-messaging consume
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: bodhi-base:latest
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:124185d5694a6926cc79965803db1ee1a4217ad6855281bcbf63027f97bc4c89
+      type: ImageChange
+  status:
+    lastVersion: 89
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","metadata":{"annotations":{},"labels":{"build":"bodhi-web"},"name":"bodhi-web","namespace":"bodhi"},"spec":{"output":{"to":{"kind":"ImageStreamTag","name":"bodhi-web:latest"}},"runPolicy":"Serial","source":{"dockerfile":"FROM bodhi-base\nLABEL \\\n  name=\"bodhi-web\" \\\n  vendor=\"Fedora Infrastructure\" \\\n  license=\"MIT\"\nRUN dnf install --refresh -y python3-pyramid_sawing\nEXPOSE 8080\nENTRYPOINT bash /etc/bodhi/start.sh","type":"Dockerfile"},"strategy":{"dockerStrategy":{"from":{"kind":"ImageStreamTag","name":"bodhi-base:latest"},"noCache":false},"type":"Docker"},"triggers":[{"imageChange":{},"type":"imageChange"}]}}
+    creationTimestamp: 2018-09-11T01:53:23Z
+    labels:
+      build: bodhi-web
+    name: bodhi-web
+    namespace: bodhi
+    resourceVersion: "109750339"
+    selfLink: /apis/build.openshift.io/v1/namespaces/bodhi/buildconfigs/bodhi-web
+    uid: 77632cb5-b565-11e8-8be3-525400deded5
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: bodhi-web:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |-
+        FROM bodhi-base
+        LABEL \
+          name="bodhi-web" \
+          vendor="Fedora Infrastructure" \
+          license="MIT"
+        RUN dnf install --refresh -y python3-pyramid_sawing
+        EXPOSE 8080
+        ENTRYPOINT bash /etc/bodhi/start.sh
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: bodhi-base:latest
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - imageChange:
+        lastTriggeredImageID: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:124185d5694a6926cc79965803db1ee1a4217ad6855281bcbf63027f97bc4c89
+      type: ImageChange
+  status:
+    lastVersion: 208
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"image.openshift.io/v1","kind":"ImageStream","metadata":{"annotations":{},"name":"bodhi-base","namespace":"bodhi"}}
+    creationTimestamp: 2019-05-15T18:47:03Z
+    generation: 1
+    name: bodhi-base
+    namespace: bodhi
+    resourceVersion: "109750338"
+    selfLink: /apis/image.openshift.io/v1/namespaces/bodhi/imagestreams/bodhi-base
+    uid: d4cfc3d3-7741-11e9-808f-525400deded5
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: docker-registry.default.svc:5000/bodhi/bodhi-base
+    tags:
+    - items:
+      - created: 2019-11-04T14:55:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:124185d5694a6926cc79965803db1ee1a4217ad6855281bcbf63027f97bc4c89
+        generation: 1
+        image: sha256:124185d5694a6926cc79965803db1ee1a4217ad6855281bcbf63027f97bc4c89
+      - created: 2019-10-28T15:21:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:cd0163a3847e2fa24e46ba2aa05f9739fd907e7408429fda3d1c5a65a43d7775
+        generation: 1
+        image: sha256:cd0163a3847e2fa24e46ba2aa05f9739fd907e7408429fda3d1c5a65a43d7775
+      - created: 2019-10-28T11:43:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:79c24b16456f7d30e89c6733cf2f014cba30753fe8d236898066fd47e5534420
+        generation: 1
+        image: sha256:79c24b16456f7d30e89c6733cf2f014cba30753fe8d236898066fd47e5534420
+      - created: 2019-10-28T11:07:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:3407b716b50a853106e7bd62abfd6dc7f37378e4cd4c8aa303f07304e1f99626
+        generation: 1
+        image: sha256:3407b716b50a853106e7bd62abfd6dc7f37378e4cd4c8aa303f07304e1f99626
+      - created: 2019-10-25T14:49:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:0f50994c388570bbc20526e3bf93e83a6d9eaf8aad4bb1d2f7768f2478db1f34
+        generation: 1
+        image: sha256:0f50994c388570bbc20526e3bf93e83a6d9eaf8aad4bb1d2f7768f2478db1f34
+      - created: 2019-10-25T09:27:45Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:5871e5ff4cc2202894f6db62b67ae29685c525e326be53d1bc78681f143ad186
+        generation: 1
+        image: sha256:5871e5ff4cc2202894f6db62b67ae29685c525e326be53d1bc78681f143ad186
+      - created: 2019-10-24T09:15:26Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:9b398c416aaa93c9f8609e330848890154cccf08c1986f08db06cd8369562f1b
+        generation: 1
+        image: sha256:9b398c416aaa93c9f8609e330848890154cccf08c1986f08db06cd8369562f1b
+      - created: 2019-10-21T08:42:16Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:f72d43532759dfee9c2fc01036a5420d4243a87164adc701a0a3f2e501191a01
+        generation: 1
+        image: sha256:f72d43532759dfee9c2fc01036a5420d4243a87164adc701a0a3f2e501191a01
+      - created: 2019-10-11T17:30:23Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:b874880cc1b2c7c4d07cca0af589cc8e4b5590ad6c9f78da5f21bb4375b3811a
+        generation: 1
+        image: sha256:b874880cc1b2c7c4d07cca0af589cc8e4b5590ad6c9f78da5f21bb4375b3811a
+      - created: 2019-10-11T07:28:22Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:fc6bc89aa1969bf08836530ad575c1fda60803562e6ad2b7a7ce9b783bfecac7
+        generation: 1
+        image: sha256:fc6bc89aa1969bf08836530ad575c1fda60803562e6ad2b7a7ce9b783bfecac7
+      - created: 2019-10-10T19:04:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:5f1e0148008b42dc40a6a189b1f1ed59837a9e92e6cfff1e388c405944120208
+        generation: 1
+        image: sha256:5f1e0148008b42dc40a6a189b1f1ed59837a9e92e6cfff1e388c405944120208
+      - created: 2019-10-10T16:01:28Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:321794f6e8d6df2201340b4492776f377ea2092eae367f707b787d7c1cea14c5
+        generation: 1
+        image: sha256:321794f6e8d6df2201340b4492776f377ea2092eae367f707b787d7c1cea14c5
+      - created: 2019-10-10T15:41:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:0273c2cf0da9ac3a8dafa94227c314a3a49ee53c53d36aa155de3e40c2c1229c
+        generation: 1
+        image: sha256:0273c2cf0da9ac3a8dafa94227c314a3a49ee53c53d36aa155de3e40c2c1229c
+      - created: 2019-10-10T15:28:06Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:225c765d136f84701fcde85b872598a5a929dcb4bbde18e451cb4d1a7d90884d
+        generation: 1
+        image: sha256:225c765d136f84701fcde85b872598a5a929dcb4bbde18e451cb4d1a7d90884d
+      - created: 2019-10-10T11:30:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:6063086ea4ea868f1415ae86c30290d41ec08e62ea2c97fc5bddad1c65d38a69
+        generation: 1
+        image: sha256:6063086ea4ea868f1415ae86c30290d41ec08e62ea2c97fc5bddad1c65d38a69
+      - created: 2019-10-10T08:19:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:8d5a8f46ba181c1117b1de0baa7bc7f7392e0b2fd6193ee38935dd759f1bb65b
+        generation: 1
+        image: sha256:8d5a8f46ba181c1117b1de0baa7bc7f7392e0b2fd6193ee38935dd759f1bb65b
+      - created: 2019-10-09T14:02:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:5cfc7701df48e624a6ceb02c19e13403ea0c65c3ca072f8f365de5b88d28bd65
+        generation: 1
+        image: sha256:5cfc7701df48e624a6ceb02c19e13403ea0c65c3ca072f8f365de5b88d28bd65
+      - created: 2019-10-09T13:23:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:1f9c3cd7a9be967f9fa4d7ce5327b86b6d11305ed5060991f2bcd9af1fd376d0
+        generation: 1
+        image: sha256:1f9c3cd7a9be967f9fa4d7ce5327b86b6d11305ed5060991f2bcd9af1fd376d0
+      - created: 2019-10-09T12:35:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:1d41897f3106961924537fdae08f60cae5738baf20fd0dee91a2645f15251b76
+        generation: 1
+        image: sha256:1d41897f3106961924537fdae08f60cae5738baf20fd0dee91a2645f15251b76
+      - created: 2019-10-09T12:25:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:e4069540e302935613779e110225b5dbc1a3eb53dec97452279542eccf59995c
+        generation: 1
+        image: sha256:e4069540e302935613779e110225b5dbc1a3eb53dec97452279542eccf59995c
+      - created: 2019-10-04T20:43:22Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:6a1df905de33254977d136e2b20b517a1eb76de1d320d0710d7c018fe4420085
+        generation: 1
+        image: sha256:6a1df905de33254977d136e2b20b517a1eb76de1d320d0710d7c018fe4420085
+      - created: 2019-09-19T14:37:43Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:c0f0cb52a8188b174cb368b89ee4649ead59837539a0bb518ea29879104f7cc6
+        generation: 1
+        image: sha256:c0f0cb52a8188b174cb368b89ee4649ead59837539a0bb518ea29879104f7cc6
+      - created: 2019-09-19T14:30:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:0cabb7848942e3c72396285c1f1530d4c4f00c06823d9fa70ea510f2f41dfaa8
+        generation: 1
+        image: sha256:0cabb7848942e3c72396285c1f1530d4c4f00c06823d9fa70ea510f2f41dfaa8
+      - created: 2019-09-19T14:23:16Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:92d006b9d6a3287856df087ae7d1ae2f4819fe0e687f525db3e30d103ac11b0d
+        generation: 1
+        image: sha256:92d006b9d6a3287856df087ae7d1ae2f4819fe0e687f525db3e30d103ac11b0d
+      - created: 2019-09-16T14:05:01Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:63b5f76027eacd8345a3637cb1bd8575436e4c58517af54fed6f4a669d2e28c5
+        generation: 1
+        image: sha256:63b5f76027eacd8345a3637cb1bd8575436e4c58517af54fed6f4a669d2e28c5
+      - created: 2019-09-13T13:47:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:18e96a77942b185d6ecf3cbd55ffc44a5d7d489ff8f7903a60eaaaf90b44bb03
+        generation: 1
+        image: sha256:18e96a77942b185d6ecf3cbd55ffc44a5d7d489ff8f7903a60eaaaf90b44bb03
+      - created: 2019-09-10T18:28:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:e66c0330eaa6f78b43e5803202161f1d940b32b6166f6520144a55487ba5f4ab
+        generation: 1
+        image: sha256:e66c0330eaa6f78b43e5803202161f1d940b32b6166f6520144a55487ba5f4ab
+      - created: 2019-08-25T01:20:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:bb27e0d53efed5d3d0b3d5c3883d8e4a66fb0ff58facecaf91c7b3d9dcd4188c
+        generation: 1
+        image: sha256:bb27e0d53efed5d3d0b3d5c3883d8e4a66fb0ff58facecaf91c7b3d9dcd4188c
+      - created: 2019-08-22T10:57:27Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:2698dba36e773eaef64945b5bbee6c362f9d24a8964781a31f3f2d998a9cccca
+        generation: 1
+        image: sha256:2698dba36e773eaef64945b5bbee6c362f9d24a8964781a31f3f2d998a9cccca
+      - created: 2019-08-21T08:16:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:c471c6b35ff9fa7b6f4e29d6b9ea67670ad8b29465753279fb7fa4ac4054969a
+        generation: 1
+        image: sha256:c471c6b35ff9fa7b6f4e29d6b9ea67670ad8b29465753279fb7fa4ac4054969a
+      - created: 2019-08-13T16:44:15Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:825c7fc7f7a3cb12bba79a271837603259f088b24fef09a7662aa5246c161d96
+        generation: 1
+        image: sha256:825c7fc7f7a3cb12bba79a271837603259f088b24fef09a7662aa5246c161d96
+      - created: 2019-07-31T19:56:22Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:f74fc747d5fe10214b320e0e3c3e21b17acbc6a8bd2923e17f0e3e10e9876fdc
+        generation: 1
+        image: sha256:f74fc747d5fe10214b320e0e3c3e21b17acbc6a8bd2923e17f0e3e10e9876fdc
+      - created: 2019-07-25T13:20:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:42dcebc970f15891e47d77ef852832e827916f186796b891f22509afd8363054
+        generation: 1
+        image: sha256:42dcebc970f15891e47d77ef852832e827916f186796b891f22509afd8363054
+      - created: 2019-07-25T09:31:19Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:dc616f21d366fd2a7333085667a00ea7e64592d051d293a10286cae66d416aed
+        generation: 1
+        image: sha256:dc616f21d366fd2a7333085667a00ea7e64592d051d293a10286cae66d416aed
+      - created: 2019-07-25T09:00:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:721925629734acd4958fd7ce23fb8e623fd88738618226ce7a5ba1ce6c7e5843
+        generation: 1
+        image: sha256:721925629734acd4958fd7ce23fb8e623fd88738618226ce7a5ba1ce6c7e5843
+      - created: 2019-07-25T08:47:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:c1c9f3ec8a30573d31d229b7ceba6755d85925225195a3ed0582c77dc8436da2
+        generation: 1
+        image: sha256:c1c9f3ec8a30573d31d229b7ceba6755d85925225195a3ed0582c77dc8436da2
+      - created: 2019-07-25T08:41:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:9e3244e520380e8ac1fc30c3e3d44dbabcf4948e9e22d8037194fdc421c81e7b
+        generation: 1
+        image: sha256:9e3244e520380e8ac1fc30c3e3d44dbabcf4948e9e22d8037194fdc421c81e7b
+      - created: 2019-07-24T15:35:27Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:731a2f1a297c3754f9cad33e53be4fb6728ad464f3e3555bf772ed3ba3173d2a
+        generation: 1
+        image: sha256:731a2f1a297c3754f9cad33e53be4fb6728ad464f3e3555bf772ed3ba3173d2a
+      - created: 2019-07-18T06:18:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:1d55f41102525d8f9711ac8fa91e155fadacc98c43604b651d093ab35fdc27c3
+        generation: 1
+        image: sha256:1d55f41102525d8f9711ac8fa91e155fadacc98c43604b651d093ab35fdc27c3
+      - created: 2019-07-17T16:09:12Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:2e73a7f1335f638ace232b18cbdd4c7eaf1ca20e510aa6f76e4f6cdfd183407d
+        generation: 1
+        image: sha256:2e73a7f1335f638ace232b18cbdd4c7eaf1ca20e510aa6f76e4f6cdfd183407d
+      - created: 2019-07-17T12:10:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:1468b76097b086c7a4c54a7f6f23578928483eb20507e72fdd704cfd245ff789
+        generation: 1
+        image: sha256:1468b76097b086c7a4c54a7f6f23578928483eb20507e72fdd704cfd245ff789
+      - created: 2019-07-17T12:04:46Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:63b67f4c4606b28ef7b11996bfe25770764bb697a4297abafba1b36dbca434d7
+        generation: 1
+        image: sha256:63b67f4c4606b28ef7b11996bfe25770764bb697a4297abafba1b36dbca434d7
+      - created: 2019-07-16T08:53:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:ba9a39cec7b4981f0d80e10e65a285d4726bb4e6e213ae8cac1da49db34caa32
+        generation: 1
+        image: sha256:ba9a39cec7b4981f0d80e10e65a285d4726bb4e6e213ae8cac1da49db34caa32
+      - created: 2019-07-16T08:02:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:9411339b3457618afd922bfb9248a23c8cff114a93b0ecd54cddb5cc701ebdb8
+        generation: 1
+        image: sha256:9411339b3457618afd922bfb9248a23c8cff114a93b0ecd54cddb5cc701ebdb8
+      - created: 2019-06-27T15:47:04Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:8a0bb751d06e6e3a4d7823533b3c1d3335b9c0b29286737929be6ae435514c18
+        generation: 1
+        image: sha256:8a0bb751d06e6e3a4d7823533b3c1d3335b9c0b29286737929be6ae435514c18
+      - created: 2019-06-26T13:58:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:6a0a506c005e402198fdc4962bf1f9cdce84279ad1c8f5a92359756b289950eb
+        generation: 1
+        image: sha256:6a0a506c005e402198fdc4962bf1f9cdce84279ad1c8f5a92359756b289950eb
+      - created: 2019-06-26T10:27:46Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:53d27d5c33040da10ebc58063ca836606cb1138186327efb0897b433b1c6db3c
+        generation: 1
+        image: sha256:53d27d5c33040da10ebc58063ca836606cb1138186327efb0897b433b1c6db3c
+      - created: 2019-06-24T19:04:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:4d1434f5a2402efbcd269144df911327f368d7b1606a6b3d3a093767cfb00eeb
+        generation: 1
+        image: sha256:4d1434f5a2402efbcd269144df911327f368d7b1606a6b3d3a093767cfb00eeb
+      - created: 2019-06-24T18:24:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:88b54f12cfd08ff60b1c0e51d96426d38af4c4ba5de878865632ef16d2d6b785
+        generation: 1
+        image: sha256:88b54f12cfd08ff60b1c0e51d96426d38af4c4ba5de878865632ef16d2d6b785
+      - created: 2019-06-24T17:30:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:fd28a5c5650dd2bb2eb1d4f28aeb6cd9b7e629add960d4f1ea55d21a1dbee8b2
+        generation: 1
+        image: sha256:fd28a5c5650dd2bb2eb1d4f28aeb6cd9b7e629add960d4f1ea55d21a1dbee8b2
+      - created: 2019-06-24T17:24:06Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:40963c1e602fa4a056536ffa6fc83d2102e61676a3bc9592eaddf5ab4963b8e0
+        generation: 1
+        image: sha256:40963c1e602fa4a056536ffa6fc83d2102e61676a3bc9592eaddf5ab4963b8e0
+      - created: 2019-06-21T18:56:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:60de2766680961ebc6cdf9faf20cb9f607d6aa481c3e6ea74b08889a4a4de9dd
+        generation: 1
+        image: sha256:60de2766680961ebc6cdf9faf20cb9f607d6aa481c3e6ea74b08889a4a4de9dd
+      - created: 2019-05-30T22:31:45Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:146976fe5c1f1a271892d864b0b81c01cf6065dc78722f072b685cc0f1dea048
+        generation: 1
+        image: sha256:146976fe5c1f1a271892d864b0b81c01cf6065dc78722f072b685cc0f1dea048
+      - created: 2019-05-30T20:57:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:a6a6fbefb155143d1dc32ee01cd00dee89756508bb4718690d8fa354fb078ed8
+        generation: 1
+        image: sha256:a6a6fbefb155143d1dc32ee01cd00dee89756508bb4718690d8fa354fb078ed8
+      - created: 2019-05-30T19:40:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:88218876e3e9e5e2ecac3592eacd5ba1a6f71a0be01e474f5677c5bd9945596f
+        generation: 1
+        image: sha256:88218876e3e9e5e2ecac3592eacd5ba1a6f71a0be01e474f5677c5bd9945596f
+      - created: 2019-05-29T21:17:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:27abd77da56d8992af93883d80a34ec5a72a8f5ac2404ef2970afeb0a42a11d7
+        generation: 1
+        image: sha256:27abd77da56d8992af93883d80a34ec5a72a8f5ac2404ef2970afeb0a42a11d7
+      - created: 2019-05-29T20:48:42Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:a2967f8969834692243323b4fbf0a1681c9eeebd302b2edc4fd8ce1ccf865e0c
+        generation: 1
+        image: sha256:a2967f8969834692243323b4fbf0a1681c9eeebd302b2edc4fd8ce1ccf865e0c
+      - created: 2019-05-24T17:34:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:27477fb50776e1cd10ed32b83e67181b979117ef01c26dedb6917f2f74dbc5a0
+        generation: 1
+        image: sha256:27477fb50776e1cd10ed32b83e67181b979117ef01c26dedb6917f2f74dbc5a0
+      - created: 2019-05-23T17:05:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:be2e8d4565ff59efb2e8fae4381fd8d97c9d8f8cc9441a41002c645388fdf02a
+        generation: 1
+        image: sha256:be2e8d4565ff59efb2e8fae4381fd8d97c9d8f8cc9441a41002c645388fdf02a
+      - created: 2019-05-22T02:18:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:099a4117085aabf49cff085e1f795fb2cc2687d4863fd12845d02e3703da6e8d
+        generation: 1
+        image: sha256:099a4117085aabf49cff085e1f795fb2cc2687d4863fd12845d02e3703da6e8d
+      - created: 2019-05-21T15:39:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:9b07376c589dd24e7d58bb0008738fedc08c3709aaf3673fe3bf6b09b833cadb
+        generation: 1
+        image: sha256:9b07376c589dd24e7d58bb0008738fedc08c3709aaf3673fe3bf6b09b833cadb
+      - created: 2019-05-17T16:03:12Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:5d819a40088dad38e03d3f0242e6c75669ace30b2c14b9ae1fac2c475336fd56
+        generation: 1
+        image: sha256:5d819a40088dad38e03d3f0242e6c75669ace30b2c14b9ae1fac2c475336fd56
+      - created: 2019-05-16T23:35:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:7d28eed20bc581c02da68b446e1af53c1499675494de048cbcfa01ed96507c23
+        generation: 1
+        image: sha256:7d28eed20bc581c02da68b446e1af53c1499675494de048cbcfa01ed96507c23
+      - created: 2019-05-16T19:18:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:0ae93ea9fdfba139b834aa8f4bbc0fba7ff4c0a2da288c9defce41bb7da2a7b4
+        generation: 1
+        image: sha256:0ae93ea9fdfba139b834aa8f4bbc0fba7ff4c0a2da288c9defce41bb7da2a7b4
+      - created: 2019-05-16T18:52:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:db7ffe079f22436a2910b23be4ab5942794098be6fe2b3ebddd8c6fd2784d3d2
+        generation: 1
+        image: sha256:db7ffe079f22436a2910b23be4ab5942794098be6fe2b3ebddd8c6fd2784d3d2
+      - created: 2019-05-15T19:28:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:35f5612e830beebbcb2570496d8b0b6ab57a20de73f34fbc4939df9a2236d27b
+        generation: 1
+        image: sha256:35f5612e830beebbcb2570496d8b0b6ab57a20de73f34fbc4939df9a2236d27b
+      - created: 2019-05-15T19:17:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:e9900bf4b2e44667eb113e33aa0aecb1b604f5ddc3f1e1bc8fe3b5bd2f2f703d
+        generation: 1
+        image: sha256:e9900bf4b2e44667eb113e33aa0aecb1b604f5ddc3f1e1bc8fe3b5bd2f2f703d
+      - created: 2019-05-15T18:58:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-base@sha256:128c355c8ee951b2166996d1e61ae033a6d991acc8a4b59b7ed5b5c7628b749b
+        generation: 1
+        image: sha256:128c355c8ee951b2166996d1e61ae033a6d991acc8a4b59b7ed5b5c7628b749b
+      tag: latest
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"image.openshift.io/v1","kind":"ImageStream","metadata":{"annotations":{},"name":"bodhi-celery","namespace":"bodhi"}}
+    creationTimestamp: 2019-10-09T12:18:59Z
+    generation: 1
+    name: bodhi-celery
+    namespace: bodhi
+    resourceVersion: "109751028"
+    selfLink: /apis/image.openshift.io/v1/namespaces/bodhi/imagestreams/bodhi-celery
+    uid: f8ebf023-ea8e-11e9-a596-525400dd984d
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: docker-registry.default.svc:5000/bodhi/bodhi-celery
+    tags:
+    - items:
+      - created: 2019-11-04T14:58:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:11a75975064928c52f8ca8ed0a66458047623efc4049dfba27227ab8f9ad7b21
+        generation: 1
+        image: sha256:11a75975064928c52f8ca8ed0a66458047623efc4049dfba27227ab8f9ad7b21
+      - created: 2019-10-28T15:23:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:53629d8965cfa0cd53aa1114aa9e8d9e0c03854857033c5d4d2975ff6b228fb5
+        generation: 1
+        image: sha256:53629d8965cfa0cd53aa1114aa9e8d9e0c03854857033c5d4d2975ff6b228fb5
+      - created: 2019-10-28T11:45:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:1f96b5e5c21d41f0075835880b142915e162092d1c255193fd730d3c686aa4ef
+        generation: 1
+        image: sha256:1f96b5e5c21d41f0075835880b142915e162092d1c255193fd730d3c686aa4ef
+      - created: 2019-10-28T11:09:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:48385aedc876d646e0430d49bc936020429d141663a886baea408de1d7494afe
+        generation: 1
+        image: sha256:48385aedc876d646e0430d49bc936020429d141663a886baea408de1d7494afe
+      - created: 2019-10-25T14:51:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:6d16c87251c07ae74d63be2ee7d7d5d6d408748f8842118ae4e38e9e5995f3bb
+        generation: 1
+        image: sha256:6d16c87251c07ae74d63be2ee7d7d5d6d408748f8842118ae4e38e9e5995f3bb
+      - created: 2019-10-25T09:29:45Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:13040292929997fa8643d7cb1903d0c5ca59cd21fb7c70b56b0b8a3c2557b03d
+        generation: 1
+        image: sha256:13040292929997fa8643d7cb1903d0c5ca59cd21fb7c70b56b0b8a3c2557b03d
+      - created: 2019-10-24T09:17:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:c40364a64c5f31872bf1d2888085b57b21559f9615cf4c9e3105124794af6829
+        generation: 1
+        image: sha256:c40364a64c5f31872bf1d2888085b57b21559f9615cf4c9e3105124794af6829
+      - created: 2019-10-21T08:44:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:ca97d084d755cb4b15c13ee5f999cad72d8664ad1c336295195eb69e23acf0c0
+        generation: 1
+        image: sha256:ca97d084d755cb4b15c13ee5f999cad72d8664ad1c336295195eb69e23acf0c0
+      - created: 2019-10-18T10:07:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:0f1751571fa88e895fb75792a02b66b6d2e917bdb2fd3d4fa8240348e74fe277
+        generation: 1
+        image: sha256:0f1751571fa88e895fb75792a02b66b6d2e917bdb2fd3d4fa8240348e74fe277
+      - created: 2019-10-11T17:32:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:b2c64cacf63b87eee98e090c93e0a472f44567bacd55abf9a1c7f0ac9ed6d988
+        generation: 1
+        image: sha256:b2c64cacf63b87eee98e090c93e0a472f44567bacd55abf9a1c7f0ac9ed6d988
+      - created: 2019-10-11T07:30:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:7ea0b0b897756380ad7c8bdb3ddcc71255f91e6e0c65b14cfee40d8b432a748b
+        generation: 1
+        image: sha256:7ea0b0b897756380ad7c8bdb3ddcc71255f91e6e0c65b14cfee40d8b432a748b
+      - created: 2019-10-10T19:07:53Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:33c7ebd86f5e767241b36830f5b1b3dea4d99dcd4ea5636b41d9f5ca5528157a
+        generation: 1
+        image: sha256:33c7ebd86f5e767241b36830f5b1b3dea4d99dcd4ea5636b41d9f5ca5528157a
+      - created: 2019-10-10T19:01:01Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:9adeffd56f8c96c30319e5de8e5ba386608ed08003ee9ac06637ba5de5484a2c
+        generation: 1
+        image: sha256:9adeffd56f8c96c30319e5de8e5ba386608ed08003ee9ac06637ba5de5484a2c
+      - created: 2019-10-10T16:03:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:5bb85661d05f0529655ebfa8f0902ece11e993182ed8a2ff157ba26d9a54f3e6
+        generation: 1
+        image: sha256:5bb85661d05f0529655ebfa8f0902ece11e993182ed8a2ff157ba26d9a54f3e6
+      - created: 2019-10-10T15:59:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:d4d79a5446a580eb819945f3489f10a3ac3c0c581a447e1cbf6b8e7190ace2fe
+        generation: 1
+        image: sha256:d4d79a5446a580eb819945f3489f10a3ac3c0c581a447e1cbf6b8e7190ace2fe
+      - created: 2019-10-10T15:45:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:e4b4c199ad545016c014561ec9159de1357fb554675f561d8fe6888b04f5e59b
+        generation: 1
+        image: sha256:e4b4c199ad545016c014561ec9159de1357fb554675f561d8fe6888b04f5e59b
+      - created: 2019-10-10T15:42:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:605f8b5d65f540a560e01a9630504dd2d2fa407efde7e833594c5956327ea460
+        generation: 1
+        image: sha256:605f8b5d65f540a560e01a9630504dd2d2fa407efde7e833594c5956327ea460
+      - created: 2019-10-10T15:30:10Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:56c0f1d8070f74bebf4cd694cdf6713c862d52f68dd33a3b0431f2ecd5e0583a
+        generation: 1
+        image: sha256:56c0f1d8070f74bebf4cd694cdf6713c862d52f68dd33a3b0431f2ecd5e0583a
+      - created: 2019-10-10T15:24:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:248bda81aa28b5ca509d9378a6330a2509228bca8f0c9b444d739443e77d0272
+        generation: 1
+        image: sha256:248bda81aa28b5ca509d9378a6330a2509228bca8f0c9b444d739443e77d0272
+      - created: 2019-10-10T11:32:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:f34b1c88e48776aa08b51fe27eb4a2e857f73136286448a56b9ea8a2b0c87078
+        generation: 1
+        image: sha256:f34b1c88e48776aa08b51fe27eb4a2e857f73136286448a56b9ea8a2b0c87078
+      - created: 2019-10-10T08:20:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:0bcfb424657912b8bccee1844260be1a2776bdd691a05b6e65571237ea50a8bd
+        generation: 1
+        image: sha256:0bcfb424657912b8bccee1844260be1a2776bdd691a05b6e65571237ea50a8bd
+      - created: 2019-10-09T14:04:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:9acf2421fd3bbcfd282a63bdaedd28323ddf254d8b4cb2f5fd78f54eb0393ce0
+        generation: 1
+        image: sha256:9acf2421fd3bbcfd282a63bdaedd28323ddf254d8b4cb2f5fd78f54eb0393ce0
+      - created: 2019-10-09T13:25:43Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:9c1aae1516f58c6b259fd8a6ae34f511afbd5b3c8d9993c74920ad931e9472bd
+        generation: 1
+        image: sha256:9c1aae1516f58c6b259fd8a6ae34f511afbd5b3c8d9993c74920ad931e9472bd
+      - created: 2019-10-09T12:37:16Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:ab7f726a03b4f1b43eb34c666fb27d6ae54ea7747281ba5e7ccb98f05323975d
+        generation: 1
+        image: sha256:ab7f726a03b4f1b43eb34c666fb27d6ae54ea7747281ba5e7ccb98f05323975d
+      - created: 2019-10-09T12:28:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:b914cc85e9c1df20591608e5850418a41c1e329b19ae990ef2edc0df489a1cd6
+        generation: 1
+        image: sha256:b914cc85e9c1df20591608e5850418a41c1e329b19ae990ef2edc0df489a1cd6
+      - created: 2019-10-09T12:20:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-celery@sha256:13d75bd49d8fb3c26c33c7f65bce724e50a55bffbcee392b7b57827f72049caf
+        generation: 1
+        image: sha256:13d75bd49d8fb3c26c33c7f65bce724e50a55bffbcee392b7b57827f72049caf
+      tag: latest
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"image.openshift.io/v1","kind":"ImageStream","metadata":{"annotations":{},"name":"bodhi-consumer","namespace":"bodhi"}}
+    creationTimestamp: 2019-05-15T18:25:20Z
+    generation: 1
+    name: bodhi-consumer
+    namespace: bodhi
+    resourceVersion: "109751016"
+    selfLink: /apis/image.openshift.io/v1/namespaces/bodhi/imagestreams/bodhi-consumer
+    uid: cbde56e3-773e-11e9-808f-525400deded5
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: docker-registry.default.svc:5000/bodhi/bodhi-consumer
+    tags:
+    - items:
+      - created: 2019-11-04T14:58:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+        generation: 1
+        image: sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+      - created: 2019-10-28T15:23:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:0001eb426119a4cabe707482e600122d95d499636ee3c26f6989be7043c34f93
+        generation: 1
+        image: sha256:0001eb426119a4cabe707482e600122d95d499636ee3c26f6989be7043c34f93
+      - created: 2019-10-28T11:45:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:9d88929d720455290d4b14725e6146173a8f1b18d7c71dcc5a0dd72fb3ad4c3c
+        generation: 1
+        image: sha256:9d88929d720455290d4b14725e6146173a8f1b18d7c71dcc5a0dd72fb3ad4c3c
+      - created: 2019-10-28T11:10:00Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:5d637dbb578ad5f006944f2ab2b0f31b79ea2f53268c3420fa48a905d1be8874
+        generation: 1
+        image: sha256:5d637dbb578ad5f006944f2ab2b0f31b79ea2f53268c3420fa48a905d1be8874
+      - created: 2019-10-25T14:51:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:f38a1650d690b70942a088c9ab39e3ee438c32c74a567db2796aacd34a009594
+        generation: 1
+        image: sha256:f38a1650d690b70942a088c9ab39e3ee438c32c74a567db2796aacd34a009594
+      - created: 2019-10-25T09:29:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:fa85d1d2a28d4fa171af447be7395ee9c0eb060922fe01ac733eaf2c2b958967
+        generation: 1
+        image: sha256:fa85d1d2a28d4fa171af447be7395ee9c0eb060922fe01ac733eaf2c2b958967
+      - created: 2019-10-24T09:17:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:b42f17d5b16afef156fb21c04895578d76f2bafe922cddf811ca102dfbe08b48
+        generation: 1
+        image: sha256:b42f17d5b16afef156fb21c04895578d76f2bafe922cddf811ca102dfbe08b48
+      - created: 2019-10-21T08:44:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:021f47b5ed893bee5a06bcb443d1f6697870bab68c6fff1b3a6e7dc0f50eee81
+        generation: 1
+        image: sha256:021f47b5ed893bee5a06bcb443d1f6697870bab68c6fff1b3a6e7dc0f50eee81
+      - created: 2019-10-18T10:07:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:5f48642ca6a5a5920d710f0809a668d9f8a6fadeb1874a677020daac26d3aff8
+        generation: 1
+        image: sha256:5f48642ca6a5a5920d710f0809a668d9f8a6fadeb1874a677020daac26d3aff8
+      - created: 2019-10-11T17:32:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:c3ce5239131556c9e425ab17b0d7ce9526b1bc5875e1c7dcf54ac29efd6fa6de
+        generation: 1
+        image: sha256:c3ce5239131556c9e425ab17b0d7ce9526b1bc5875e1c7dcf54ac29efd6fa6de
+      - created: 2019-10-11T07:30:08Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:34558da65213fd705d284279856185c78f099cbea2ea368886f4d08f9018094c
+        generation: 1
+        image: sha256:34558da65213fd705d284279856185c78f099cbea2ea368886f4d08f9018094c
+      - created: 2019-10-10T19:07:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:5be77a1bd2b569632d6520f3ddd7f89b7561699508ccd123df678a0d43f7caeb
+        generation: 1
+        image: sha256:5be77a1bd2b569632d6520f3ddd7f89b7561699508ccd123df678a0d43f7caeb
+      - created: 2019-10-10T19:01:27Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:76522b6b687b0940a5840f9a2ba6b695894fafef7bac75197829b38464400576
+        generation: 1
+        image: sha256:76522b6b687b0940a5840f9a2ba6b695894fafef7bac75197829b38464400576
+      - created: 2019-10-10T16:03:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:e18b2db8ee506edbd870cee07463607db39e03ff6840804c8a8a828407dda68e
+        generation: 1
+        image: sha256:e18b2db8ee506edbd870cee07463607db39e03ff6840804c8a8a828407dda68e
+      - created: 2019-10-10T15:59:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:2efe58d49cec7776476f48ed99402770d58ea799943833b13ea32c5b75b2740b
+        generation: 1
+        image: sha256:2efe58d49cec7776476f48ed99402770d58ea799943833b13ea32c5b75b2740b
+      - created: 2019-10-10T15:45:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:596d1e3b3900413705a0e0d235ca4da9874ebfa30ff904b9e0a9d0a0c1780a8e
+        generation: 1
+        image: sha256:596d1e3b3900413705a0e0d235ca4da9874ebfa30ff904b9e0a9d0a0c1780a8e
+      - created: 2019-10-10T15:42:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:10121d1839cfcdd9e1d0c0d65abaaa478a8e7aef68a89930e7ccc16e328062a5
+        generation: 1
+        image: sha256:10121d1839cfcdd9e1d0c0d65abaaa478a8e7aef68a89930e7ccc16e328062a5
+      - created: 2019-10-10T15:29:56Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:1dc9a8ea359269ecadca5fbf80254d88330d595984b1c09c668415a0bf5ce333
+        generation: 1
+        image: sha256:1dc9a8ea359269ecadca5fbf80254d88330d595984b1c09c668415a0bf5ce333
+      - created: 2019-10-10T15:24:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:484fbdd34ccaa77eebcae7c0711667a12381ac2b177f0efea7f5cb03baacabe8
+        generation: 1
+        image: sha256:484fbdd34ccaa77eebcae7c0711667a12381ac2b177f0efea7f5cb03baacabe8
+      - created: 2019-10-10T11:32:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:605aa3e0f0cd2736e46e1d99aedf56dbb1c8df3d3354a3f15b41f2184215a740
+        generation: 1
+        image: sha256:605aa3e0f0cd2736e46e1d99aedf56dbb1c8df3d3354a3f15b41f2184215a740
+      - created: 2019-10-10T08:20:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:ef2d72bcd652b5f4125a28615917a2fa8b3cb5a6cf369097c392ff564d24de67
+        generation: 1
+        image: sha256:ef2d72bcd652b5f4125a28615917a2fa8b3cb5a6cf369097c392ff564d24de67
+      - created: 2019-10-09T14:04:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d448dd3519acf1ae551f5880405c98a1050ac39cd4e6aa97dd674d6df1f4bc64
+        generation: 1
+        image: sha256:d448dd3519acf1ae551f5880405c98a1050ac39cd4e6aa97dd674d6df1f4bc64
+      - created: 2019-10-09T13:25:43Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:945866a730d473fcef73c109b268a56bdb4ebd54af5b0e08dfc03971abd739bc
+        generation: 1
+        image: sha256:945866a730d473fcef73c109b268a56bdb4ebd54af5b0e08dfc03971abd739bc
+      - created: 2019-10-09T12:37:17Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:658f21a42b1c7a17c6e604e751ca6da7facf9703ce754febd6d0dd2297d2bb4f
+        generation: 1
+        image: sha256:658f21a42b1c7a17c6e604e751ca6da7facf9703ce754febd6d0dd2297d2bb4f
+      - created: 2019-10-09T12:27:45Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:e18a0986c920e828bdc56866c7d24a146c38f95e3734b69f8776fe10b9a12aac
+        generation: 1
+        image: sha256:e18a0986c920e828bdc56866c7d24a146c38f95e3734b69f8776fe10b9a12aac
+      - created: 2019-10-04T20:44:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:6436c978ace9f11dc7454bf21c1d22860a4e58f90c82b1c92f53170143a86f88
+        generation: 1
+        image: sha256:6436c978ace9f11dc7454bf21c1d22860a4e58f90c82b1c92f53170143a86f88
+      - created: 2019-09-19T14:39:12Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:55dd7075c067ea048652fa545d5919a234a28923f277697f6e32ccff3ba05321
+        generation: 1
+        image: sha256:55dd7075c067ea048652fa545d5919a234a28923f277697f6e32ccff3ba05321
+      - created: 2019-09-19T14:32:37Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:7ecdb1a40b339936d213bf2d3ae567417c2fd6447870ce2a8f5d014ab086c69f
+        generation: 1
+        image: sha256:7ecdb1a40b339936d213bf2d3ae567417c2fd6447870ce2a8f5d014ab086c69f
+      - created: 2019-09-19T14:25:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:79cf7a53c837c0cb54cff452db9548bfdec16a57001266b57891effee0a418d2
+        generation: 1
+        image: sha256:79cf7a53c837c0cb54cff452db9548bfdec16a57001266b57891effee0a418d2
+      - created: 2019-09-16T14:06:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:c01f24137974dc09bf806a1dfab5999a0438f846272efc5670bcbb11be028eef
+        generation: 1
+        image: sha256:c01f24137974dc09bf806a1dfab5999a0438f846272efc5670bcbb11be028eef
+      - created: 2019-09-13T13:48:23Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d8e3b2250dee2b1d396d193ed31b19861e9f7262ea1d6e8a21c6d2bd99b0dad3
+        generation: 1
+        image: sha256:d8e3b2250dee2b1d396d193ed31b19861e9f7262ea1d6e8a21c6d2bd99b0dad3
+      - created: 2019-09-10T18:30:22Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:3821f83ed6f61c583b8a7c189af96b95ad9e0d491fa2a08313911eeb56a85ee4
+        generation: 1
+        image: sha256:3821f83ed6f61c583b8a7c189af96b95ad9e0d491fa2a08313911eeb56a85ee4
+      - created: 2019-08-25T01:21:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:0632d918a4233b30a8863729d12e907ff16c5d0e8dc37bd0fb3bdac5f3a4209d
+        generation: 1
+        image: sha256:0632d918a4233b30a8863729d12e907ff16c5d0e8dc37bd0fb3bdac5f3a4209d
+      - created: 2019-08-22T10:58:01Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:1ffe8d51f078e3a6e2937526968a8a2f852892c2c8423d2ae2bfed383831241b
+        generation: 1
+        image: sha256:1ffe8d51f078e3a6e2937526968a8a2f852892c2c8423d2ae2bfed383831241b
+      - created: 2019-08-21T08:17:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:5e5bfa274099d9469cf4bd134de4f2a93c533f8776e48050876d7f3411010313
+        generation: 1
+        image: sha256:5e5bfa274099d9469cf4bd134de4f2a93c533f8776e48050876d7f3411010313
+      - created: 2019-08-13T16:44:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:4c03d6dd3ad28ec1a31044a4706c94075330587beb98666baa76797cda64bb20
+        generation: 1
+        image: sha256:4c03d6dd3ad28ec1a31044a4706c94075330587beb98666baa76797cda64bb20
+      - created: 2019-07-31T19:56:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:18a23bb822a20a72803c4b9cc7d5bb1623c915e27d53b84d6ad13bb24d835561
+        generation: 1
+        image: sha256:18a23bb822a20a72803c4b9cc7d5bb1623c915e27d53b84d6ad13bb24d835561
+      - created: 2019-07-25T13:20:53Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:261b4bf0928a76b98cb11d0f7428019ab31cd716fa0de76f1f011a4e59be57d8
+        generation: 1
+        image: sha256:261b4bf0928a76b98cb11d0f7428019ab31cd716fa0de76f1f011a4e59be57d8
+      - created: 2019-07-25T09:31:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:958810bbc2309f316803f8a4be38ca622b368be036bf04c113ea565992bf35a9
+        generation: 1
+        image: sha256:958810bbc2309f316803f8a4be38ca622b368be036bf04c113ea565992bf35a9
+      - created: 2019-07-25T09:00:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:45a754ab8c962b4cd7006832805140640827698a28d21910625068e9c0aa51c7
+        generation: 1
+        image: sha256:45a754ab8c962b4cd7006832805140640827698a28d21910625068e9c0aa51c7
+      - created: 2019-07-25T08:57:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d339f00ded8f45490cc06ebb946df019774edf5fb74e8ddb38a8c24c6fa0afa7
+        generation: 1
+        image: sha256:d339f00ded8f45490cc06ebb946df019774edf5fb74e8ddb38a8c24c6fa0afa7
+      - created: 2019-07-25T08:48:05Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:e652b7316915181eb78821d13023dd4422ff31dbfa98b1c317e543cf4bff01c7
+        generation: 1
+        image: sha256:e652b7316915181eb78821d13023dd4422ff31dbfa98b1c317e543cf4bff01c7
+      - created: 2019-07-25T08:41:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:36464697e4990714848908cb453c4ac38f6aa81cf693573ed2254e90760b73a1
+        generation: 1
+        image: sha256:36464697e4990714848908cb453c4ac38f6aa81cf693573ed2254e90760b73a1
+      - created: 2019-07-24T15:35:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:98936b3d1d1299320999d27913fa5429ae7613e8f94fd20cfe83a07ff841ac5c
+        generation: 1
+        image: sha256:98936b3d1d1299320999d27913fa5429ae7613e8f94fd20cfe83a07ff841ac5c
+      - created: 2019-07-24T15:33:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:96446e6279a8930012f185b39257d1859c88fa74c3544c6a8897a5cf08315df8
+        generation: 1
+        image: sha256:96446e6279a8930012f185b39257d1859c88fa74c3544c6a8897a5cf08315df8
+      - created: 2019-07-18T06:19:37Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:6cd5c5c0aa9a2a6563a3e8ad685bbb4933cde9c9304c24403c94b60f72358048
+        generation: 1
+        image: sha256:6cd5c5c0aa9a2a6563a3e8ad685bbb4933cde9c9304c24403c94b60f72358048
+      - created: 2019-07-17T16:10:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d62537f0d1b19137ac96c59829c4bd8050f1e6aab2013fcbd04f30cc38d59807
+        generation: 1
+        image: sha256:d62537f0d1b19137ac96c59829c4bd8050f1e6aab2013fcbd04f30cc38d59807
+      - created: 2019-07-17T12:12:12Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:dce9d744756b0007a59b84bcf0884ca86553743a224a9506dbf0394cdbaa27a7
+        generation: 1
+        image: sha256:dce9d744756b0007a59b84bcf0884ca86553743a224a9506dbf0394cdbaa27a7
+      - created: 2019-07-17T12:10:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:545708ec3600b5910f5e8a44ded2a2b6afaf3ef82fe2581faa46249a64546c07
+        generation: 1
+        image: sha256:545708ec3600b5910f5e8a44ded2a2b6afaf3ef82fe2581faa46249a64546c07
+      - created: 2019-07-16T08:54:23Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:c0776e3a2a3640a19a3f4f2132c071f9387ffc93abbc9cc2d8cf781aa1929dac
+        generation: 1
+        image: sha256:c0776e3a2a3640a19a3f4f2132c071f9387ffc93abbc9cc2d8cf781aa1929dac
+      - created: 2019-07-16T08:02:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:677d9217b9395f1f25027d669b7fe61609835bcb43c73183cf3f03749df5cb4c
+        generation: 1
+        image: sha256:677d9217b9395f1f25027d669b7fe61609835bcb43c73183cf3f03749df5cb4c
+      - created: 2019-07-15T14:21:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:23590093693ea6a5ee826d4c5e357ffda663cece1c21208152def42121871557
+        generation: 1
+        image: sha256:23590093693ea6a5ee826d4c5e357ffda663cece1c21208152def42121871557
+      - created: 2019-07-15T11:44:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:0686035e921b97d85d7f55b35e6abab0e21137b0a82e914ea4fbddeaebf3a564
+        generation: 1
+        image: sha256:0686035e921b97d85d7f55b35e6abab0e21137b0a82e914ea4fbddeaebf3a564
+      - created: 2019-06-27T15:47:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d897f684c29a2c69bd08a3feeb90e6e57e4a70ade2ab209a51dcbbe489614287
+        generation: 1
+        image: sha256:d897f684c29a2c69bd08a3feeb90e6e57e4a70ade2ab209a51dcbbe489614287
+      - created: 2019-06-27T15:45:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:5e8d311ed419e28ab9762a313eece78703ee8ddfd79b256c97b199781888c035
+        generation: 1
+        image: sha256:5e8d311ed419e28ab9762a313eece78703ee8ddfd79b256c97b199781888c035
+      - created: 2019-06-26T13:59:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:e02db8fc008b311df83b14b2118361a4386c3bac29ba432be49c46a13a5cda60
+        generation: 1
+        image: sha256:e02db8fc008b311df83b14b2118361a4386c3bac29ba432be49c46a13a5cda60
+      - created: 2019-06-26T10:29:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:43092471de3fa98e7b035bf70ea66c2d2b45a4a753cdeaa4f4b8b1b00ac51266
+        generation: 1
+        image: sha256:43092471de3fa98e7b035bf70ea66c2d2b45a4a753cdeaa4f4b8b1b00ac51266
+      - created: 2019-06-24T19:05:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:cc48120319ad3eee84568b37c33d45e271a9c040fd7f0ae589cf2205b80022c4
+        generation: 1
+        image: sha256:cc48120319ad3eee84568b37c33d45e271a9c040fd7f0ae589cf2205b80022c4
+      - created: 2019-06-24T18:25:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:442abb262702fee3503f30e5e05075685ce930d526e482df36c8759e11509dd4
+        generation: 1
+        image: sha256:442abb262702fee3503f30e5e05075685ce930d526e482df36c8759e11509dd4
+      - created: 2019-06-24T17:32:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:e1c6c71724679826949878365bfc02a59782c627fcad8ae62f4a74cc1e415cab
+        generation: 1
+        image: sha256:e1c6c71724679826949878365bfc02a59782c627fcad8ae62f4a74cc1e415cab
+      - created: 2019-06-24T17:24:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:1c8704cabfbe94e4a380537d8f88fab319179abb631f9615c8ecc76b54f7b8b4
+        generation: 1
+        image: sha256:1c8704cabfbe94e4a380537d8f88fab319179abb631f9615c8ecc76b54f7b8b4
+      - created: 2019-06-21T18:57:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:ea90e49c0dc68c741c1afa82c2db5e8713e9df8ca397b09f152546306f1e467c
+        generation: 1
+        image: sha256:ea90e49c0dc68c741c1afa82c2db5e8713e9df8ca397b09f152546306f1e467c
+      - created: 2019-06-21T14:47:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:15cda83104a992a18dbbc312bd74777c49377ba38b428f5d614a114f14e3bb4f
+        generation: 1
+        image: sha256:15cda83104a992a18dbbc312bd74777c49377ba38b428f5d614a114f14e3bb4f
+      - created: 2019-06-21T13:25:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:9a42fb818cae5cc949a56213c90e360029cc459a710ce48001166fc68be13539
+        generation: 1
+        image: sha256:9a42fb818cae5cc949a56213c90e360029cc459a710ce48001166fc68be13539
+      - created: 2019-05-30T22:33:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:c3ae0c3b8867bc4c9ef2dcdad6797873c32296f1f77067f78e162ddcbc8651f2
+        generation: 1
+        image: sha256:c3ae0c3b8867bc4c9ef2dcdad6797873c32296f1f77067f78e162ddcbc8651f2
+      - created: 2019-05-30T20:58:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:d25bbf1d9af35f12e180dc93bfa5dec13d8711a0bb85626ccb1e1a2a3a4e5cf5
+        generation: 1
+        image: sha256:d25bbf1d9af35f12e180dc93bfa5dec13d8711a0bb85626ccb1e1a2a3a4e5cf5
+      - created: 2019-05-30T19:42:27Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:88d6ff09443be6fceb6965ce2db01dc6d23d156a54d7d333de2a00b724df532f
+        generation: 1
+        image: sha256:88d6ff09443be6fceb6965ce2db01dc6d23d156a54d7d333de2a00b724df532f
+      - created: 2019-05-30T19:37:28Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:b55bddd48b4f1db2a6b29d4258274ec018a85b707672348f74ce9ed8eb9d16ae
+        generation: 1
+        image: sha256:b55bddd48b4f1db2a6b29d4258274ec018a85b707672348f74ce9ed8eb9d16ae
+      - created: 2019-05-29T21:19:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:954e6db88c868840b7f07b04dbfa7e4d4375165d59ad8d24a473cfcd25eec2be
+        generation: 1
+        image: sha256:954e6db88c868840b7f07b04dbfa7e4d4375165d59ad8d24a473cfcd25eec2be
+      - created: 2019-05-29T20:50:07Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:6c7f53f85bc5eeb830cef0e814820a54ac9125e34ae3b22f59ace033a6f95660
+        generation: 1
+        image: sha256:6c7f53f85bc5eeb830cef0e814820a54ac9125e34ae3b22f59ace033a6f95660
+      - created: 2019-05-29T20:45:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:40d368f2cdeb0730f2460387a62c7889aaf1c9d719f7d4275b38496ed6f1cbe1
+        generation: 1
+        image: sha256:40d368f2cdeb0730f2460387a62c7889aaf1c9d719f7d4275b38496ed6f1cbe1
+      - created: 2019-05-28T16:51:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:4bf4506039c1d48dc060655c02f84abb42a82360d9181d36fb8eae91a8d13e2f
+        generation: 1
+        image: sha256:4bf4506039c1d48dc060655c02f84abb42a82360d9181d36fb8eae91a8d13e2f
+      - created: 2019-05-24T17:36:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:2efcfccc53e0313f55f327d37778fcd4efc7d672e0edd19be1171b19aa6d8ca3
+        generation: 1
+        image: sha256:2efcfccc53e0313f55f327d37778fcd4efc7d672e0edd19be1171b19aa6d8ca3
+      - created: 2019-05-24T15:47:23Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:f0dedd9f02d54b6ae7a610cb6a0fbba840df9ee815c245195d2e9ca2c332344d
+        generation: 1
+        image: sha256:f0dedd9f02d54b6ae7a610cb6a0fbba840df9ee815c245195d2e9ca2c332344d
+      - created: 2019-05-23T17:07:07Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:79d31918840c38163afe2e6a05aceaed08c1b4968586655c93a76e0024a3513d
+        generation: 1
+        image: sha256:79d31918840c38163afe2e6a05aceaed08c1b4968586655c93a76e0024a3513d
+      - created: 2019-05-22T02:20:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:93f2c67acb03d235b7b9038e05bcbb1139a13991d48404e7f9d6aaad9c3728b7
+        generation: 1
+        image: sha256:93f2c67acb03d235b7b9038e05bcbb1139a13991d48404e7f9d6aaad9c3728b7
+      - created: 2019-05-21T15:40:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:58ad725b190ca5785377f4d699b98c80dcffef6a51478ee5463abb2244d39c99
+        generation: 1
+        image: sha256:58ad725b190ca5785377f4d699b98c80dcffef6a51478ee5463abb2244d39c99
+      - created: 2019-05-17T16:03:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:c60ea40a47077c17fd2e355818b3b7e1d03873ae7d9dc8eaa151a866cbcbc58b
+        generation: 1
+        image: sha256:c60ea40a47077c17fd2e355818b3b7e1d03873ae7d9dc8eaa151a866cbcbc58b
+      - created: 2019-05-16T23:36:08Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:1553b2049529fb023244d600a6bdb1db09677dbcd62063469d648b1defa3b0d8
+        generation: 1
+        image: sha256:1553b2049529fb023244d600a6bdb1db09677dbcd62063469d648b1defa3b0d8
+      - created: 2019-05-16T19:19:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:7406585d5c38fd7395c8c9b10b0627328f8fdba58ed46e2dbe1c37efbb4e6ab0
+        generation: 1
+        image: sha256:7406585d5c38fd7395c8c9b10b0627328f8fdba58ed46e2dbe1c37efbb4e6ab0
+      - created: 2019-05-16T18:52:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:71480508646ccf41e147813a77df1ff7b28bc2b99499d4e3f3c02fbc71b6faaa
+        generation: 1
+        image: sha256:71480508646ccf41e147813a77df1ff7b28bc2b99499d4e3f3c02fbc71b6faaa
+      - created: 2019-05-15T19:33:37Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:f5292bf7914139f8e8946f8e36383a169aed437fe9be6b8579d9e4744cc522ad
+        generation: 1
+        image: sha256:f5292bf7914139f8e8946f8e36383a169aed437fe9be6b8579d9e4744cc522ad
+      - created: 2019-05-15T18:53:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:121184769c1c6b0b57679ff68f09441c80cb1e132dae1612ae0522d5a5d65323
+        generation: 1
+        image: sha256:121184769c1c6b0b57679ff68f09441c80cb1e132dae1612ae0522d5a5d65323
+      - created: 2019-05-15T18:29:49Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:cd4a0ea4133c2507ad3b78ecf3c7e5d05f07b03ae80e2321afcc9422ac3d8666
+        generation: 1
+        image: sha256:cd4a0ea4133c2507ad3b78ecf3c7e5d05f07b03ae80e2321afcc9422ac3d8666
+      tag: latest
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"image.openshift.io/v1","kind":"ImageStream","metadata":{"annotations":{},"name":"bodhi-web","namespace":"bodhi"}}
+    creationTimestamp: 2018-09-11T01:53:22Z
+    generation: 1
+    name: bodhi-web
+    namespace: bodhi
+    resourceVersion: "109751220"
+    selfLink: /apis/image.openshift.io/v1/namespaces/bodhi/imagestreams/bodhi-web
+    uid: 76b19a85-b565-11e8-9d79-525400d38d95
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: docker-registry.default.svc:5000/bodhi/bodhi-web
+    tags:
+    - items:
+      - created: 2019-11-04T14:59:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+        generation: 1
+        image: sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+      - created: 2019-10-28T15:26:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:6ec810a6cd16fbe4c6811cdd6b7188de00d6a757e1c19db19f5a048ba3f24821
+        generation: 1
+        image: sha256:6ec810a6cd16fbe4c6811cdd6b7188de00d6a757e1c19db19f5a048ba3f24821
+      - created: 2019-10-28T11:47:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:60a9c6f23acdb319877923bbf7053a7029d4c10016955b96a063272badd6d0b5
+        generation: 1
+        image: sha256:60a9c6f23acdb319877923bbf7053a7029d4c10016955b96a063272badd6d0b5
+      - created: 2019-10-28T11:12:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7153e8655f07448ca3179b5f59db5841009d5072ea0d4d251b5c07b139adc2d8
+        generation: 1
+        image: sha256:7153e8655f07448ca3179b5f59db5841009d5072ea0d4d251b5c07b139adc2d8
+      - created: 2019-10-25T14:53:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c14b21fbc109f90b9dd18ea3d9cc7027ae02b0cbcecb2dce2a47b4c393bf72e0
+        generation: 1
+        image: sha256:c14b21fbc109f90b9dd18ea3d9cc7027ae02b0cbcecb2dce2a47b4c393bf72e0
+      - created: 2019-10-25T09:31:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:561736783a8b59d62ed1c8765c49a3bc5ce2cd84d7ebcd90f0e12976aaea1915
+        generation: 1
+        image: sha256:561736783a8b59d62ed1c8765c49a3bc5ce2cd84d7ebcd90f0e12976aaea1915
+      - created: 2019-10-24T09:19:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:6c226f6904295ac21e8f78e77750693f9eaa7a51324e60bf765ae0e6bcbf8e47
+        generation: 1
+        image: sha256:6c226f6904295ac21e8f78e77750693f9eaa7a51324e60bf765ae0e6bcbf8e47
+      - created: 2019-10-21T08:46:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:5b68c8d31a94329a39b51ffc9de88c654578e92b5b524e4d55bdffe20d548b11
+        generation: 1
+        image: sha256:5b68c8d31a94329a39b51ffc9de88c654578e92b5b524e4d55bdffe20d548b11
+      - created: 2019-10-11T18:34:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3f190d1808878932eac6ec35d1049e8fe448c75e0e5f0461acf56267bd6364d1
+        generation: 1
+        image: sha256:3f190d1808878932eac6ec35d1049e8fe448c75e0e5f0461acf56267bd6364d1
+      - created: 2019-10-11T07:48:08Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:15fb53731c525519551aaf00a74defcea2268e9a5ff54ee32d02e4e2bab59470
+        generation: 1
+        image: sha256:15fb53731c525519551aaf00a74defcea2268e9a5ff54ee32d02e4e2bab59470
+      - created: 2019-10-10T19:12:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:1997bfe090199272b3c488d3c0892e157a1e1022527a6346b2dc82df007dee84
+        generation: 1
+        image: sha256:1997bfe090199272b3c488d3c0892e157a1e1022527a6346b2dc82df007dee84
+      - created: 2019-10-10T16:52:26Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a98b6380384e52de0c702bd0d82cb8875e19405929ffc6379be073ff968ef82f
+        generation: 1
+        image: sha256:a98b6380384e52de0c702bd0d82cb8875e19405929ffc6379be073ff968ef82f
+      - created: 2019-10-10T11:36:17Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ec05c44d232db524d0b782f7597c62362546d3f9ac55c9072fc3590d558b4908
+        generation: 1
+        image: sha256:ec05c44d232db524d0b782f7597c62362546d3f9ac55c9072fc3590d558b4908
+      - created: 2019-10-10T09:24:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7bbade2bce0ef1b5392ede4809979338f82c163de6f41915048eca9ebcd8d550
+        generation: 1
+        image: sha256:7bbade2bce0ef1b5392ede4809979338f82c163de6f41915048eca9ebcd8d550
+      - created: 2019-10-04T20:49:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:390799348da325db7f1df10dd59dcbbde72ebcd7a3d2c7746cc299b39e568d3e
+        generation: 1
+        image: sha256:390799348da325db7f1df10dd59dcbbde72ebcd7a3d2c7746cc299b39e568d3e
+      - created: 2019-09-19T14:41:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:34bce560fad9ccb0562c4abc64cf9fe313163377f8cf3daba1fb1ec52e111aa2
+        generation: 1
+        image: sha256:34bce560fad9ccb0562c4abc64cf9fe313163377f8cf3daba1fb1ec52e111aa2
+      - created: 2019-09-19T14:33:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:8fbab09d4e3638a57d7fac7fb989f6da50b247e957b18c308a4b99b2ffa855e5
+        generation: 1
+        image: sha256:8fbab09d4e3638a57d7fac7fb989f6da50b247e957b18c308a4b99b2ffa855e5
+      - created: 2019-09-19T14:27:15Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:1729451dcdc5d2114d6e9c2e63ff32f5ae6483019b18f31e7b2130f1c94f8076
+        generation: 1
+        image: sha256:1729451dcdc5d2114d6e9c2e63ff32f5ae6483019b18f31e7b2130f1c94f8076
+      - created: 2019-09-16T14:07:54Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c8f33312480f65f9b0803f56c1baf8364850919b9758c678afc81c37885704df
+        generation: 1
+        image: sha256:c8f33312480f65f9b0803f56c1baf8364850919b9758c678afc81c37885704df
+      - created: 2019-09-13T13:49:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:96fc4c911253cea8f0a0bb3a2ff44a0531ef1763c5b3a593b2055b21263df2bf
+        generation: 1
+        image: sha256:96fc4c911253cea8f0a0bb3a2ff44a0531ef1763c5b3a593b2055b21263df2bf
+      - created: 2019-09-10T18:30:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3aaaa9a050f74067800e89580984e8f9bc5cddb1c25fa1c751373b682bf77ec8
+        generation: 1
+        image: sha256:3aaaa9a050f74067800e89580984e8f9bc5cddb1c25fa1c751373b682bf77ec8
+      - created: 2019-08-25T01:22:27Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:eb865e6b4922a1032466d62bacd35bbbd39f6e54e5afdd47c63d66fa55ff874a
+        generation: 1
+        image: sha256:eb865e6b4922a1032466d62bacd35bbbd39f6e54e5afdd47c63d66fa55ff874a
+      - created: 2019-08-22T10:58:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:804ad4707e533b70902cb968279da460ead66f3825b200ee754b11d2e40ed0ea
+        generation: 1
+        image: sha256:804ad4707e533b70902cb968279da460ead66f3825b200ee754b11d2e40ed0ea
+      - created: 2019-08-21T08:17:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4c13b3c7f619bf7dde174ff6372e1e707ab28a205add8ed9e383c91dc239c478
+        generation: 1
+        image: sha256:4c13b3c7f619bf7dde174ff6372e1e707ab28a205add8ed9e383c91dc239c478
+      - created: 2019-08-13T16:45:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:0b970756501d9b4c8a02d7914ad892cdd2e735740e796c6609caa766e4230117
+        generation: 1
+        image: sha256:0b970756501d9b4c8a02d7914ad892cdd2e735740e796c6609caa766e4230117
+      - created: 2019-07-31T19:58:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:d0d9aa185a7c20903a103a9e0288977032feda6f2b8f7992ed4d8b897e55af4d
+        generation: 1
+        image: sha256:d0d9aa185a7c20903a103a9e0288977032feda6f2b8f7992ed4d8b897e55af4d
+      - created: 2019-07-25T13:21:42Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a9f140fed19fa2e054b5a2ccd6b674649de416452bd0c740c13c96d598232a5b
+        generation: 1
+        image: sha256:a9f140fed19fa2e054b5a2ccd6b674649de416452bd0c740c13c96d598232a5b
+      - created: 2019-07-25T09:32:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:de1773dc35c33bc0a52d159dd515fd1dc704c7d78e6af24f38ef31d37caf63a9
+        generation: 1
+        image: sha256:de1773dc35c33bc0a52d159dd515fd1dc704c7d78e6af24f38ef31d37caf63a9
+      - created: 2019-07-24T15:36:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:21fc616495fa0e8a30aff3827e3fbd4b175b4ccb787a0d756719be4a08a3f789
+        generation: 1
+        image: sha256:21fc616495fa0e8a30aff3827e3fbd4b175b4ccb787a0d756719be4a08a3f789
+      - created: 2019-07-18T06:21:01Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:bdac754c39c200b750e7d89f6645cf2e1b3041fef429cc26df06c6039b47dfb9
+        generation: 1
+        image: sha256:bdac754c39c200b750e7d89f6645cf2e1b3041fef429cc26df06c6039b47dfb9
+      - created: 2019-07-17T16:12:20Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:9f8526a301427a1c99279c2b4d1ee1ec10c4c9741f0c8e07cad4cac4a1fc086c
+        generation: 1
+        image: sha256:9f8526a301427a1c99279c2b4d1ee1ec10c4c9741f0c8e07cad4cac4a1fc086c
+      - created: 2019-07-17T12:13:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:f5d3cfb89f9dd54f44e0200d78a8aa23a7d4cbce7105fcb50c477337565e9e78
+        generation: 1
+        image: sha256:f5d3cfb89f9dd54f44e0200d78a8aa23a7d4cbce7105fcb50c477337565e9e78
+      - created: 2019-07-17T12:07:05Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ddf880d6a9d1412896abf1dc3039955a2bd19b69697af0469b3c6c256623b4ca
+        generation: 1
+        image: sha256:ddf880d6a9d1412896abf1dc3039955a2bd19b69697af0469b3c6c256623b4ca
+      - created: 2019-07-16T08:55:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:fc98c7f7e3fb16936271ae2cab3318cbe804e7cabba23d8dafc4fd1365b626e8
+        generation: 1
+        image: sha256:fc98c7f7e3fb16936271ae2cab3318cbe804e7cabba23d8dafc4fd1365b626e8
+      - created: 2019-07-16T08:03:21Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a541975b3494c887cd1f6c670d3c1b1897ba368284ac32ea3cb85c0331719218
+        generation: 1
+        image: sha256:a541975b3494c887cd1f6c670d3c1b1897ba368284ac32ea3cb85c0331719218
+      - created: 2019-06-27T15:48:15Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:dcfa35e025c7412e2984aacaa180a315593bbcbeb34ca00ea93f9fafd0a166cb
+        generation: 1
+        image: sha256:dcfa35e025c7412e2984aacaa180a315593bbcbeb34ca00ea93f9fafd0a166cb
+      - created: 2019-06-26T13:59:20Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:03576b8993e5a3cfbfa0e1f7a5f5d0db141d0edd6d9d41fbabdcdaa37d22ae43
+        generation: 1
+        image: sha256:03576b8993e5a3cfbfa0e1f7a5f5d0db141d0edd6d9d41fbabdcdaa37d22ae43
+      - created: 2019-06-26T10:30:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:299d7e6bbf64de8601c908a68c0e7a8b84a4a95c93fd370f240c301b5a053e8f
+        generation: 1
+        image: sha256:299d7e6bbf64de8601c908a68c0e7a8b84a4a95c93fd370f240c301b5a053e8f
+      - created: 2019-06-24T19:06:17Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:157c4124f7cb446bcce560bcd5819053f4cdd75f44e9f7035e5c0160e7a3c5d8
+        generation: 1
+        image: sha256:157c4124f7cb446bcce560bcd5819053f4cdd75f44e9f7035e5c0160e7a3c5d8
+      - created: 2019-06-24T18:25:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:fdc36f7dd7d2690963d7e44fc98f7be9206342d65e3240aa02a6b021d0a53b41
+        generation: 1
+        image: sha256:fdc36f7dd7d2690963d7e44fc98f7be9206342d65e3240aa02a6b021d0a53b41
+      - created: 2019-06-24T17:33:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:0d437e0953a7cf9ec8bcb6589d2b8b60b8aa6a2dfc74465b8bdf9edb665f54f6
+        generation: 1
+        image: sha256:0d437e0953a7cf9ec8bcb6589d2b8b60b8aa6a2dfc74465b8bdf9edb665f54f6
+      - created: 2019-06-24T17:27:33Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c96dc1387ae7b9db666c342e7b07af1bd23c61b8f351007e46b9772760fd4394
+        generation: 1
+        image: sha256:c96dc1387ae7b9db666c342e7b07af1bd23c61b8f351007e46b9772760fd4394
+      - created: 2019-06-24T09:52:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7bd836627f3d93449ba11dc2f1977d470f673804f0a7f3c0d14d2765ce02b593
+        generation: 1
+        image: sha256:7bd836627f3d93449ba11dc2f1977d470f673804f0a7f3c0d14d2765ce02b593
+      - created: 2019-06-21T18:58:32Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:86226634013e77734cfae07d91d0d3a9e0c53d782e7b2630c66ef2b9b3a29781
+        generation: 1
+        image: sha256:86226634013e77734cfae07d91d0d3a9e0c53d782e7b2630c66ef2b9b3a29781
+      - created: 2019-05-30T22:34:45Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:9996a7022a6867782c2b7417f061818faed58c2cee34b269ce3f25e30c10f744
+        generation: 1
+        image: sha256:9996a7022a6867782c2b7417f061818faed58c2cee34b269ce3f25e30c10f744
+      - created: 2019-05-30T21:00:13Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:0101949d3531cd4af5d6aecd255f72fc0a92680d89ffeb8b98e8119ad9290ffc
+        generation: 1
+        image: sha256:0101949d3531cd4af5d6aecd255f72fc0a92680d89ffeb8b98e8119ad9290ffc
+      - created: 2019-05-30T19:44:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7ac32655b08d4356bc3813c4d49925417d124140dcc73a8208d5bc98d448f409
+        generation: 1
+        image: sha256:7ac32655b08d4356bc3813c4d49925417d124140dcc73a8208d5bc98d448f409
+      - created: 2019-05-29T21:20:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3dab93d3d4e525b15310484436cd90af302a4dd5d3dcb19224dcedc3fee21b01
+        generation: 1
+        image: sha256:3dab93d3d4e525b15310484436cd90af302a4dd5d3dcb19224dcedc3fee21b01
+      - created: 2019-05-29T20:51:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ab25ab770563d36bd6afe7cfc96a988622329252399df9d034f395689d51a13e
+        generation: 1
+        image: sha256:ab25ab770563d36bd6afe7cfc96a988622329252399df9d034f395689d51a13e
+      - created: 2019-05-28T16:52:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:2148ee04702c2b0409839468a9daf506f33cce1d1e97316a3b7eacb153f1a07d
+        generation: 1
+        image: sha256:2148ee04702c2b0409839468a9daf506f33cce1d1e97316a3b7eacb153f1a07d
+      - created: 2019-05-24T17:38:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:43e6494b0f89cc513301608dfacb5ebad7df56e1418f0c7bac750ff916cf7df3
+        generation: 1
+        image: sha256:43e6494b0f89cc513301608dfacb5ebad7df56e1418f0c7bac750ff916cf7df3
+      - created: 2019-05-23T17:08:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7acf7dd2d73a0fc217f931b0f9a8b9a5591ad740ffd952e2a837f536572d158b
+        generation: 1
+        image: sha256:7acf7dd2d73a0fc217f931b0f9a8b9a5591ad740ffd952e2a837f536572d158b
+      - created: 2019-05-22T02:21:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c9f41ddebf807ff7f3a82136c8abd3a4018c45e7770ed0382b143182e2905b31
+        generation: 1
+        image: sha256:c9f41ddebf807ff7f3a82136c8abd3a4018c45e7770ed0382b143182e2905b31
+      - created: 2019-05-21T15:42:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c7acf99db32369eceff0d2f395bf59c753b04561c2e44643788d3b8b3e432ee0
+        generation: 1
+        image: sha256:c7acf99db32369eceff0d2f395bf59c753b04561c2e44643788d3b8b3e432ee0
+      - created: 2019-05-17T16:04:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:64f6d9159b3dc1b54d978ef58fc1436c6d421c4694489bef93a2ed39d1b05f96
+        generation: 1
+        image: sha256:64f6d9159b3dc1b54d978ef58fc1436c6d421c4694489bef93a2ed39d1b05f96
+      - created: 2019-05-16T23:36:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4df396ae5a158389281a67fe53cda67878b0f1ad58e8e7d58361bd69d585e08b
+        generation: 1
+        image: sha256:4df396ae5a158389281a67fe53cda67878b0f1ad58e8e7d58361bd69d585e08b
+      - created: 2019-05-16T19:20:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ec6b033b68bb0dbea68f830fd2590937e571c4f09d8ee64c907c1fc2c26b0cb9
+        generation: 1
+        image: sha256:ec6b033b68bb0dbea68f830fd2590937e571c4f09d8ee64c907c1fc2c26b0cb9
+      - created: 2019-05-16T18:55:16Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:8c501698be7a689909aedf85e8fbcc81c124c51d7bf17835f47ace32b2a1b794
+        generation: 1
+        image: sha256:8c501698be7a689909aedf85e8fbcc81c124c51d7bf17835f47ace32b2a1b794
+      - created: 2019-05-15T19:31:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7feae84b5cea77d52387ab18c8d3ea64ba8554abbc04b2d08e0320c5cf230a32
+        generation: 1
+        image: sha256:7feae84b5cea77d52387ab18c8d3ea64ba8554abbc04b2d08e0320c5cf230a32
+      - created: 2019-05-15T18:42:22Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:7a3a74baad09ae9ae9c57d3c113a96227b5dd8ac92517f4c6345f39e031f46af
+        generation: 1
+        image: sha256:7a3a74baad09ae9ae9c57d3c113a96227b5dd8ac92517f4c6345f39e031f46af
+      - created: 2019-05-15T18:30:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:5bd7aabe4a5ab9b4900c11c0d7d96c63d836919cd2c0a59243c8277498bce7c2
+        generation: 1
+        image: sha256:5bd7aabe4a5ab9b4900c11c0d7d96c63d836919cd2c0a59243c8277498bce7c2
+      - created: 2019-05-14T21:04:39Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a1c7425ec85a20907b15d423d8a9ae40e68794bcc0f5e755c6c87c9dffb7d491
+        generation: 1
+        image: sha256:a1c7425ec85a20907b15d423d8a9ae40e68794bcc0f5e755c6c87c9dffb7d491
+      - created: 2019-05-14T20:32:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:9b027d2dc0987901b30ac02e024c27c7c860c81edd5080701136a193edc863de
+        generation: 1
+        image: sha256:9b027d2dc0987901b30ac02e024c27c7c860c81edd5080701136a193edc863de
+      - created: 2019-05-14T20:27:43Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4d7d3d4b4f7f70650abef0eab60811fbfe7650307aeb611e1cc9eb49b119d9b6
+        generation: 1
+        image: sha256:4d7d3d4b4f7f70650abef0eab60811fbfe7650307aeb611e1cc9eb49b119d9b6
+      - created: 2019-05-14T19:57:55Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:16b7e236174cfe5454bec2a84e69de6cadbe8c8927c9bdd1d0b49043b6295e46
+        generation: 1
+        image: sha256:16b7e236174cfe5454bec2a84e69de6cadbe8c8927c9bdd1d0b49043b6295e46
+      - created: 2019-05-14T19:43:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:cf015caf89d5d4da3898700031465f5ad6840de200779597351f2f046afbbbd5
+        generation: 1
+        image: sha256:cf015caf89d5d4da3898700031465f5ad6840de200779597351f2f046afbbbd5
+      - created: 2019-05-14T19:31:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:400453252ef1375f0691d45f2ee0c84b3b01d9a02298afd84a7343853fe67bcb
+        generation: 1
+        image: sha256:400453252ef1375f0691d45f2ee0c84b3b01d9a02298afd84a7343853fe67bcb
+      - created: 2019-05-14T19:07:30Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ad32ca488755347a767db6b1b537d1669070e7ee4758a8f2c76c03deccf4a36f
+        generation: 1
+        image: sha256:ad32ca488755347a767db6b1b537d1669070e7ee4758a8f2c76c03deccf4a36f
+      - created: 2019-05-14T17:54:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:db6619f7cc0eea7ddf03c219b41b27478245be92c1ee960356b75178d1871bd7
+        generation: 1
+        image: sha256:db6619f7cc0eea7ddf03c219b41b27478245be92c1ee960356b75178d1871bd7
+      - created: 2019-05-14T17:34:05Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e8108c9d0f0e566f5dc26457d801b7c9c5c368be715097bd0ac3bafef3ced080
+        generation: 1
+        image: sha256:e8108c9d0f0e566f5dc26457d801b7c9c5c368be715097bd0ac3bafef3ced080
+      - created: 2019-05-14T16:56:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:9fdb53f7226305ee9efc9a4b4dff23d3a5f73c420ad81bfbadad6118cbf60034
+        generation: 1
+        image: sha256:9fdb53f7226305ee9efc9a4b4dff23d3a5f73c420ad81bfbadad6118cbf60034
+      - created: 2019-05-14T14:37:18Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:8279a64cba04f41e9737b54b57abca81046aa24ee365c4b35839680f0475447b
+        generation: 1
+        image: sha256:8279a64cba04f41e9737b54b57abca81046aa24ee365c4b35839680f0475447b
+      - created: 2019-05-13T22:24:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4875b6680b06923ce82948ed4369e16a099a8d7053bd35528b9490a0fdfac609
+        generation: 1
+        image: sha256:4875b6680b06923ce82948ed4369e16a099a8d7053bd35528b9490a0fdfac609
+      - created: 2019-05-13T22:00:20Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:58a2e315cd6a7910b334f934bc09aee76bfef3066dc18b70620b929d64e6969c
+        generation: 1
+        image: sha256:58a2e315cd6a7910b334f934bc09aee76bfef3066dc18b70620b929d64e6969c
+      - created: 2019-05-13T21:38:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:1e058e06fbf667cc56bb1cfd67be4a93f6e851790bb60473569e9786bf9d82b6
+        generation: 1
+        image: sha256:1e058e06fbf667cc56bb1cfd67be4a93f6e851790bb60473569e9786bf9d82b6
+      - created: 2019-05-13T18:51:29Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:5e12fe452d76614581a479f3c216d421ce9bc1982fe6fc00355a2fe0f315fcc7
+        generation: 1
+        image: sha256:5e12fe452d76614581a479f3c216d421ce9bc1982fe6fc00355a2fe0f315fcc7
+      - created: 2019-05-10T19:43:56Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:15dc8de03ae29715cdd2d113a9a551e735858d31e7606344c394ac3edf6a65dc
+        generation: 1
+        image: sha256:15dc8de03ae29715cdd2d113a9a551e735858d31e7606344c394ac3edf6a65dc
+      - created: 2019-05-10T18:20:30Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:b5930b68ab1b6be25f17905a96a8c4defc2b03b5287958b2e4c03591b3b617d4
+        generation: 1
+        image: sha256:b5930b68ab1b6be25f17905a96a8c4defc2b03b5287958b2e4c03591b3b617d4
+      - created: 2019-05-10T17:14:07Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:d088a3b8ae2f3421cd66ff0a4a71aa5a2a67e79b7ab6248110b312c573f0c945
+        generation: 1
+        image: sha256:d088a3b8ae2f3421cd66ff0a4a71aa5a2a67e79b7ab6248110b312c573f0c945
+      - created: 2019-05-10T17:03:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c6e46b1badec35bbd6312c8c8653faac884e5d3c70c01434ff1fb81b3a9bcc5d
+        generation: 1
+        image: sha256:c6e46b1badec35bbd6312c8c8653faac884e5d3c70c01434ff1fb81b3a9bcc5d
+      - created: 2019-05-10T16:44:32Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:cd10545ba253c2c8e42e248901be0ef9bdffb0692139f537dc779ff9677714c1
+        generation: 1
+        image: sha256:cd10545ba253c2c8e42e248901be0ef9bdffb0692139f537dc779ff9677714c1
+      - created: 2019-05-03T17:53:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:293a834ea74296ef400e3d60f7bb3d821c7c5f9b560ffc57c9af0babc9574a94
+        generation: 1
+        image: sha256:293a834ea74296ef400e3d60f7bb3d821c7c5f9b560ffc57c9af0babc9574a94
+      - created: 2019-04-16T13:27:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3499d38dce58f3756c19ff1fce1a747815d68a4859cccdcc289aba1884c80135
+        generation: 1
+        image: sha256:3499d38dce58f3756c19ff1fce1a747815d68a4859cccdcc289aba1884c80135
+      - created: 2019-04-15T15:19:49Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:84c33a032e83a45a6c06bf2d707d61cc10256ab1e64c76dac7b28f80794c2dd0
+        generation: 1
+        image: sha256:84c33a032e83a45a6c06bf2d707d61cc10256ab1e64c76dac7b28f80794c2dd0
+      - created: 2019-04-03T09:44:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4b7bb7a81fc54a9e00cd517a34711bb501fea9a975fc2b2c441736aa7f057e97
+        generation: 1
+        image: sha256:4b7bb7a81fc54a9e00cd517a34711bb501fea9a975fc2b2c441736aa7f057e97
+      - created: 2019-03-12T15:12:56Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4b20e6968900c383fcfcf04c9a61fc72e675718bd83620a5f1af0b489c384f3a
+        generation: 1
+        image: sha256:4b20e6968900c383fcfcf04c9a61fc72e675718bd83620a5f1af0b489c384f3a
+      - created: 2019-03-11T16:18:40Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3b71bb87cf5e6a6b4b25c59a35633450724609f6186d058791b0317eb98d0e3
+        generation: 1
+        image: sha256:e3b71bb87cf5e6a6b4b25c59a35633450724609f6186d058791b0317eb98d0e3
+      - created: 2019-03-04T19:05:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:bb1f5fd1e628397d5ccdd04f442204ddfa4244d10f61ed1c9be4606b540a9415
+        generation: 1
+        image: sha256:bb1f5fd1e628397d5ccdd04f442204ddfa4244d10f61ed1c9be4606b540a9415
+      - created: 2019-02-28T20:20:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:d4141fd9bac399b3975f5706c1b97e379d3f92cbccd0e92eec3c40fa54538443
+        generation: 1
+        image: sha256:d4141fd9bac399b3975f5706c1b97e379d3f92cbccd0e92eec3c40fa54538443
+      - created: 2019-02-27T10:37:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:823c16ef585047fe9b0b0313057e2e77300f788642ced0f7bea2661db9ccb7ea
+        generation: 1
+        image: sha256:823c16ef585047fe9b0b0313057e2e77300f788642ced0f7bea2661db9ccb7ea
+      - created: 2019-02-19T23:32:06Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:530e216832003ca6a40c3a86263418a0629c89a685f1b8d5a4e5d008ccf8eedb
+        generation: 1
+        image: sha256:530e216832003ca6a40c3a86263418a0629c89a685f1b8d5a4e5d008ccf8eedb
+      - created: 2019-02-19T23:16:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:cbfdc04a4636eb5412daf6fe26f08de0f2a4aa54140223fe5e16c3a857baeb69
+        generation: 1
+        image: sha256:cbfdc04a4636eb5412daf6fe26f08de0f2a4aa54140223fe5e16c3a857baeb69
+      - created: 2019-02-19T22:43:19Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:057b0e37b687483f25dff04821625d13ee84b8884663da07f8e9d1d31ada6499
+        generation: 1
+        image: sha256:057b0e37b687483f25dff04821625d13ee84b8884663da07f8e9d1d31ada6499
+      - created: 2019-02-19T04:26:19Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:836db3a4f7cec13433b20cc77bb4c835baf52a5df0f395fd8718bf5384a73068
+        generation: 1
+        image: sha256:836db3a4f7cec13433b20cc77bb4c835baf52a5df0f395fd8718bf5384a73068
+      - created: 2019-02-19T04:13:19Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:58c2dd857ec22ed49a6b9e6bab72215d114501c31ff4d4f83bf91962ddc85860
+        generation: 1
+        image: sha256:58c2dd857ec22ed49a6b9e6bab72215d114501c31ff4d4f83bf91962ddc85860
+      - created: 2019-02-18T14:38:58Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:cad06600502fd1b81f165aaf2c9540c1866d1e518fefcfaeb792fd9cbbdaea49
+        generation: 1
+        image: sha256:cad06600502fd1b81f165aaf2c9540c1866d1e518fefcfaeb792fd9cbbdaea49
+      - created: 2019-02-18T14:14:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:87f9669981e52dab7afcfeb078d08fc025ad4f7ad252c262d3710e7ba4241444
+        generation: 1
+        image: sha256:87f9669981e52dab7afcfeb078d08fc025ad4f7ad252c262d3710e7ba4241444
+      - created: 2019-02-15T19:41:08Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:b25956de70f00db4c50c9186d7a7cdbe2528976d8f253c7094d38946445a077e
+        generation: 1
+        image: sha256:b25956de70f00db4c50c9186d7a7cdbe2528976d8f253c7094d38946445a077e
+      - created: 2019-02-14T21:21:59Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:d3788d1147949515345b357cc70d1c8b5912aab4a2076328cdd3f88d6a1c18b6
+        generation: 1
+        image: sha256:d3788d1147949515345b357cc70d1c8b5912aab4a2076328cdd3f88d6a1c18b6
+      - created: 2019-02-14T14:35:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:da0c3f1a6badb9fb2a2c5739279c1e99e517cb7778f808cb6871d22af7484dcf
+        generation: 1
+        image: sha256:da0c3f1a6badb9fb2a2c5739279c1e99e517cb7778f808cb6871d22af7484dcf
+      - created: 2019-02-13T23:09:51Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c3d2f38988474fc6736185a2f337bc0324dce6220609b2f52c61d3ad4e6ac649
+        generation: 1
+        image: sha256:c3d2f38988474fc6736185a2f337bc0324dce6220609b2f52c61d3ad4e6ac649
+      - created: 2019-01-17T09:34:32Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:5d72e6b0c2d47333e3c478fb651e2173f31853d6ff26637fed3f652770f6cc4c
+        generation: 1
+        image: sha256:5d72e6b0c2d47333e3c478fb651e2173f31853d6ff26637fed3f652770f6cc4c
+      - created: 2019-01-14T13:30:56Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:77f4761e03b0426d5ed1fccf9e96e6a25a0bcf1ab86f8145c4f65fa03bbfb709
+        generation: 1
+        image: sha256:77f4761e03b0426d5ed1fccf9e96e6a25a0bcf1ab86f8145c4f65fa03bbfb709
+      - created: 2018-12-18T16:51:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:00bc94cf14ea91e51e500e4d043b8dd2fefae64c3f63fe10c81b8c46f48c0afe
+        generation: 1
+        image: sha256:00bc94cf14ea91e51e500e4d043b8dd2fefae64c3f63fe10c81b8c46f48c0afe
+      - created: 2018-12-18T00:17:24Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:f3c7b2501c372dd050f0a6acae3c6569abc9bceeb410f82ca32ee0b62b5a7f9a
+        generation: 1
+        image: sha256:f3c7b2501c372dd050f0a6acae3c6569abc9bceeb410f82ca32ee0b62b5a7f9a
+      - created: 2018-12-18T00:01:00Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e4ff973ccccff394acacb23e6d197584c5310f549cb82e8cb0808660209bbe76
+        generation: 1
+        image: sha256:e4ff973ccccff394acacb23e6d197584c5310f549cb82e8cb0808660209bbe76
+      - created: 2018-12-05T16:46:09Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a181b84c0f9c084989a79fe804664d5528db2714b0032fa08dd77e1397995903
+        generation: 1
+        image: sha256:a181b84c0f9c084989a79fe804664d5528db2714b0032fa08dd77e1397995903
+      - created: 2018-12-05T16:13:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:a4d2a08008e003c434b6ced8ceaf2279140808bed83ae4dd34089962b0e05fdb
+        generation: 1
+        image: sha256:a4d2a08008e003c434b6ced8ceaf2279140808bed83ae4dd34089962b0e05fdb
+      - created: 2018-12-04T07:00:52Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3e5206681d249b7ea8fc4180b530c06ff1944f374d5d4299065c9a697aeede44
+        generation: 1
+        image: sha256:3e5206681d249b7ea8fc4180b530c06ff1944f374d5d4299065c9a697aeede44
+      - created: 2018-12-03T21:10:28Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:f718e0dc1b1637f16203205f1a22ae7bf9f79b6b864c76e8e632412e91f85026
+        generation: 1
+        image: sha256:f718e0dc1b1637f16203205f1a22ae7bf9f79b6b864c76e8e632412e91f85026
+      - created: 2018-12-03T21:00:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:b22dc4c859d0f7863ea2cd44d87fa8a2fd81b533110999f32d3017e25dc7b0f5
+        generation: 1
+        image: sha256:b22dc4c859d0f7863ea2cd44d87fa8a2fd81b533110999f32d3017e25dc7b0f5
+      - created: 2018-12-03T20:25:47Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3152b7e288eac09c6bcc4046a7a31283785977a62662752b7b007284d87005af
+        generation: 1
+        image: sha256:3152b7e288eac09c6bcc4046a7a31283785977a62662752b7b007284d87005af
+      - created: 2018-11-28T15:41:37Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c9b2871cb8ddbd00b2df0ae6a7aa11085b22b23588fe1719167e7b676057e575
+        generation: 1
+        image: sha256:c9b2871cb8ddbd00b2df0ae6a7aa11085b22b23588fe1719167e7b676057e575
+      - created: 2018-11-28T15:37:11Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:df1a5743b768bce6c4592dd0957bdcd73b1bfaecf08acb42467753017a33912e
+        generation: 1
+        image: sha256:df1a5743b768bce6c4592dd0957bdcd73b1bfaecf08acb42467753017a33912e
+      - created: 2018-11-28T15:32:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:6fa4f400ea11b856a9bca738fcdf754c189bc99817eb7f8a321830cfcaba27ae
+        generation: 1
+        image: sha256:6fa4f400ea11b856a9bca738fcdf754c189bc99817eb7f8a321830cfcaba27ae
+      - created: 2018-11-27T17:32:05Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e22764f25c81f991d9e3fbcc20d967f94386977a4ab0912831ca3d2e16beba5c
+        generation: 1
+        image: sha256:e22764f25c81f991d9e3fbcc20d967f94386977a4ab0912831ca3d2e16beba5c
+      - created: 2018-11-27T16:47:03Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:1bf55df819f2e745b03a85f2cba046e79cf073a51b0b600281ca7fe8f401254c
+        generation: 1
+        image: sha256:1bf55df819f2e745b03a85f2cba046e79cf073a51b0b600281ca7fe8f401254c
+      - created: 2018-11-26T21:23:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3ac25880792495183125b25bf6038ead002c1963a76fd66c435d41c6bc30081
+        generation: 1
+        image: sha256:e3ac25880792495183125b25bf6038ead002c1963a76fd66c435d41c6bc30081
+      - created: 2018-11-19T17:46:21Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4145843f95a190722f38b6e5d800cd11ca5fee74bfeb667af27756e2f6d55cee
+        generation: 1
+        image: sha256:4145843f95a190722f38b6e5d800cd11ca5fee74bfeb667af27756e2f6d55cee
+      - created: 2018-11-19T17:18:26Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:2a75b4804e231aa6ad53a4cb53372fd761d245f0e06bff57a1f4cccb3dd3b2f2
+        generation: 1
+        image: sha256:2a75b4804e231aa6ad53a4cb53372fd761d245f0e06bff57a1f4cccb3dd3b2f2
+      - created: 2018-11-19T15:05:10Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:6206508514da268c46bf694356e339970db9e5ddb0db5b056577be0a4cf5e138
+        generation: 1
+        image: sha256:6206508514da268c46bf694356e339970db9e5ddb0db5b056577be0a4cf5e138
+      - created: 2018-11-16T18:55:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:0a8c08e8389a8517cb691c18862774fcdd6158138a45138d3fa50a078b4738da
+        generation: 1
+        image: sha256:0a8c08e8389a8517cb691c18862774fcdd6158138a45138d3fa50a078b4738da
+      - created: 2018-11-16T17:35:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:ab1cdbb9c57ea63b79a0be8f7352494eb3f12f4c84d9665cad1e78095ac9968f
+        generation: 1
+        image: sha256:ab1cdbb9c57ea63b79a0be8f7352494eb3f12f4c84d9665cad1e78095ac9968f
+      - created: 2018-11-15T23:29:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e4908dcc2d14e28d992681d82f93eab8b43ad701c78119dd3408b77eadb451a6
+        generation: 1
+        image: sha256:e4908dcc2d14e28d992681d82f93eab8b43ad701c78119dd3408b77eadb451a6
+      - created: 2018-11-15T23:10:25Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:5c2e16e2196725fe3db2a353212b4a5d17527bab2b8e3c636c0f2b8f9743540c
+        generation: 1
+        image: sha256:5c2e16e2196725fe3db2a353212b4a5d17527bab2b8e3c636c0f2b8f9743540c
+      - created: 2018-11-14T16:57:38Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:6f7180bd52c1b8f33858c5df4167c024a2db01fcda7de48b6fb1a91af045d306
+        generation: 1
+        image: sha256:6f7180bd52c1b8f33858c5df4167c024a2db01fcda7de48b6fb1a91af045d306
+      - created: 2018-11-13T22:54:41Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4f23d36c4c40dee5f4f2e30bff64c5c130d417ff5de9a63eac3ded7e5f86e8f5
+        generation: 1
+        image: sha256:4f23d36c4c40dee5f4f2e30bff64c5c130d417ff5de9a63eac3ded7e5f86e8f5
+      - created: 2018-11-13T22:39:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:8107eb271a6d47360fae77b0ba4254b6896533941970be5da6d2eaa9d784cf61
+        generation: 1
+        image: sha256:8107eb271a6d47360fae77b0ba4254b6896533941970be5da6d2eaa9d784cf61
+      - created: 2018-11-13T17:51:21Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:cc220071afaaded3318adf550e5cc18c9635b726165bdd014510f82666ef689f
+        generation: 1
+        image: sha256:cc220071afaaded3318adf550e5cc18c9635b726165bdd014510f82666ef689f
+      - created: 2018-11-13T17:42:02Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:17aa3232a421d96230adec5138a1aa30a453d990b0ace5ca33c8ac48bf143eff
+        generation: 1
+        image: sha256:17aa3232a421d96230adec5138a1aa30a453d990b0ace5ca33c8ac48bf143eff
+      - created: 2018-11-13T16:14:32Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:c3ce82bf960b6b5d326666d8a31b70a23f2c441e4e447a5cb120c071021f2de6
+        generation: 1
+        image: sha256:c3ce82bf960b6b5d326666d8a31b70a23f2c441e4e447a5cb120c071021f2de6
+      - created: 2018-11-12T20:20:08Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:b9f969d4acb0a580928bece0ac6cb0a72cd03432e1daa7d1f57063fcf573f122
+        generation: 1
+        image: sha256:b9f969d4acb0a580928bece0ac6cb0a72cd03432e1daa7d1f57063fcf573f122
+      - created: 2018-11-10T03:10:31Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:2040127110f206b77bf04723ae387dd68d15dcdf4d2fb7dd057f17c923ffc5d8
+        generation: 1
+        image: sha256:2040127110f206b77bf04723ae387dd68d15dcdf4d2fb7dd057f17c923ffc5d8
+      - created: 2018-11-09T21:45:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:4cc04072a3750fb83bd806375109ad26b8946dbdead01c78b61ad8f2b05dd084
+        generation: 1
+        image: sha256:4cc04072a3750fb83bd806375109ad26b8946dbdead01c78b61ad8f2b05dd084
+      - created: 2018-11-09T21:37:44Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:800a5625c59369cff16ae1ce6884978076be836ad30e73cae72d562e60b46ecf
+        generation: 1
+        image: sha256:800a5625c59369cff16ae1ce6884978076be836ad30e73cae72d562e60b46ecf
+      - created: 2018-11-05T21:38:36Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:dd02ba8fbf8e6db2e57bf66ff40b696a0e4453d520877b77aada2a0ca4779b49
+        generation: 1
+        image: sha256:dd02ba8fbf8e6db2e57bf66ff40b696a0e4453d520877b77aada2a0ca4779b49
+      - created: 2018-11-01T20:13:50Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:fcd7752acd8d68c7d82dc09e18d92730b8a7a13e4b161e9408b8d9ab10ce6a07
+        generation: 1
+        image: sha256:fcd7752acd8d68c7d82dc09e18d92730b8a7a13e4b161e9408b8d9ab10ce6a07
+      - created: 2018-11-01T19:52:35Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3f19b5f89890f15d4637e4c5e5ea0bea058a1709de05eb02de4e2fa06fce197b
+        generation: 1
+        image: sha256:3f19b5f89890f15d4637e4c5e5ea0bea058a1709de05eb02de4e2fa06fce197b
+      - created: 2018-11-01T14:03:16Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:3c9b4c3401921a1bf530f4c3698d37642bde18042ed773d4ae37946aee7c1fce
+        generation: 1
+        image: sha256:3c9b4c3401921a1bf530f4c3698d37642bde18042ed773d4ae37946aee7c1fce
+      - created: 2018-10-31T22:54:14Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:086d378c50d64a4377ed55e6d81a18075e70c806a20461b0588f4436031fb299
+        generation: 1
+        image: sha256:086d378c50d64a4377ed55e6d81a18075e70c806a20461b0588f4436031fb299
+      - created: 2018-10-31T22:41:57Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:98fe4a7d6a5e24e48e2566c363d8673413ddab68ff984144c8e12bd5812086a9
+        generation: 1
+        image: sha256:98fe4a7d6a5e24e48e2566c363d8673413ddab68ff984144c8e12bd5812086a9
+      - created: 2018-10-31T22:27:36Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:11293fb1bfcbb141c6b19bc4c1c490caf766195f6fdeb0d9faed32ad4ae6e243
+        generation: 1
+        image: sha256:11293fb1bfcbb141c6b19bc4c1c490caf766195f6fdeb0d9faed32ad4ae6e243
+      - created: 2018-10-09T21:51:12Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:dc496b6c0df56e2046c1be7738a024b9f78c9b2bc95d5c125d44ca6485c53c78
+        generation: 1
+        image: sha256:dc496b6c0df56e2046c1be7738a024b9f78c9b2bc95d5c125d44ca6485c53c78
+      - created: 2018-10-08T20:07:34Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:0a8ba180d1a85de79e693d2b91fa3d39e84435175f74b0c7abc4e5fcfdffa15c
+        generation: 1
+        image: sha256:0a8ba180d1a85de79e693d2b91fa3d39e84435175f74b0c7abc4e5fcfdffa15c
+      - created: 2018-10-01T17:04:04Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:98611954020bca05a8bdabe274d170c6bb965ff05b8f27da7b5923a7c40c663c
+        generation: 1
+        image: sha256:98611954020bca05a8bdabe274d170c6bb965ff05b8f27da7b5923a7c40c663c
+      - created: 2018-09-28T00:09:48Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:55d66c99ad74684193775cabf19264272a4959048ac9ffef316043b59f9f0ded
+        generation: 1
+        image: sha256:55d66c99ad74684193775cabf19264272a4959048ac9ffef316043b59f9f0ded
+      - created: 2018-09-17T18:06:28Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:75650361018bcefa5205d52f005786700da961379d5534f337a611c059000f5e
+        generation: 1
+        image: sha256:75650361018bcefa5205d52f005786700da961379d5534f337a611c059000f5e
+      - created: 2018-09-13T15:58:53Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:f680fbe4d59ce112849f2e24972da6a2a2033d6919a6f2f39c8af6537d4bbb94
+        generation: 1
+        image: sha256:f680fbe4d59ce112849f2e24972da6a2a2033d6919a6f2f39c8af6537d4bbb94
+      - created: 2018-09-11T21:10:07Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:1b06126f2d19f412d5b84f1454d4618d9f80a69447a4e86a5ad34c300dc5e415
+        generation: 1
+        image: sha256:1b06126f2d19f412d5b84f1454d4618d9f80a69447a4e86a5ad34c300dc5e415
+      - created: 2018-09-11T02:12:56Z
+        dockerImageReference: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:766ba13623c27f2f4abc93599e3a6b6c0d0f618db5995226c73e9bc68b497717
+        generation: 1
+        image: sha256:766ba13623c27f2f4abc93599e3a6b6c0d0f618db5995226c73e9bc68b497717
+      tag: latest
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"route.openshift.io/v1","kind":"Route","metadata":{"annotations":{},"labels":{"app":"bodhi"},"name":"bodhi-web","namespace":"bodhi"},"spec":{"host":"bodhi.stg.fedoraproject.org","port":{"targetPort":"web"},"tls":{"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"},"to":{"kind":"Service","name":"bodhi-web"}}}
+    creationTimestamp: 2018-09-11T01:53:28Z
+    labels:
+      app: bodhi
+    name: bodhi-web
+    namespace: bodhi
+    resourceVersion: "33660"
+    selfLink: /apis/route.openshift.io/v1/namespaces/bodhi/routes/bodhi-web
+    uid: 7a2c5c1d-b565-11e8-8be3-525400deded5
+  spec:
+    host: bodhi.stg.fedoraproject.org
+    port:
+      targetPort: web
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: bodhi-web
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2018-09-11T01:53:28Z
+        status: "True"
+        type: Admitted
+      host: bodhi.stg.fedoraproject.org
+      routerName: router
+      wildcardPolicy: None
+kind: List
+metadata: {}

@@ -41,7 +41,7 @@ let bodhiBaseImageTrigger =
       , from =
           { kind = "ImageStreamTag"
           , name = "bodhi-base:latest"
-          , namespace = "asaleh-test"
+          , namespace = "\${NAMESPACE}"
           }
       }
 
@@ -49,6 +49,12 @@ in  { apiVersion =
         "template.openshift.io/v1"
     , kind = "Template"
     , metadata = { name = "bodhi-template" }
+    , parameters =
+        [ { description = "Namespace, mostly for image building"
+          , generate = "expression"
+          , name = "NAMESPACE"
+          }
+        ]
     , objects =
         [ templateObjectTypes.Service
             { apiVersion = "v1"
@@ -214,7 +220,7 @@ in  { apiVersion =
                         ⫽ { containers =
                               [   defaults.Container
                                 ⫽ { image =
-                                      "docker-registry.default.svc:5000/asaleh-test/bodhi-base:latest"
+                                      "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
                                   , imagePullPolicy = "Always"
                                   , name = "bodhi-celery"
                                   , resources = {=}
@@ -274,7 +280,7 @@ in  { apiVersion =
                         ⫽ { containers =
                               [   defaults.Container
                                 ⫽ { image =
-                                      "docker-registry.default.svc:5000/asaleh-test/bodhi-base:latest"
+                                      "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
                                   , imagePullPolicy = "Always"
                                   , name = "bodhi-consumer"
                                   , command = [ "/usr/bin/fedora-messaging" ]
@@ -325,7 +331,7 @@ in  { apiVersion =
                         ⫽ { containers =
                               [   defaults.Container
                                 ⫽ { image =
-                                      "docker-registry.default.svc:5000/asaleh-test/bodhi-base:latest"
+                                      "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
                                   , imagePullPolicy = "Always"
                                   , command = [ "/usr/bin/pserve-3" ]
                                   , args =
@@ -419,7 +425,7 @@ in  { apiVersion =
                           { kind =
                               "DockerImage"
                           , name =
-                              "docker-registry.default.svc:5000/asaleh-test/bodhi-base:latest"
+                              "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
                           }
                       , importPolicy = {=}
                       , name = "latest"
@@ -455,16 +461,6 @@ in  { apiVersion =
             , data =
                 [ { mapKey = "development.ini"
                   , mapValue = ./files/development.ini as Text
-                  }
-                ]
-            }
-        , templateObjectTypes.ConfigMap
-            { apiVersion = "v1"
-            , kind = "ConfigMap"
-            , metadata = { name = "bodhi-db-init" }
-            , data =
-                [ { mapKey = "db_init.sh"
-                  , mapValue = ./files/db_init.sh as Text
                   }
                 ]
             }

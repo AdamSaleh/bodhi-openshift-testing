@@ -1,0 +1,1 @@
+{ defaultMode : Natural, name : Text }

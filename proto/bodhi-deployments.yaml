@@ -1,0 +1,330 @@
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: bodhi
+      service: celery
+    name: bodhi-celery
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-celery
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: bodhi-celery
+          deploymentconfig: bodhi-celery
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-celery:latest
+          imagePullPolicy: Always
+          name: bodhi-celery
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-celery
+        from:
+          kind: ImageStreamTag
+          name: bodhi-celery:latest
+          namespace: bodhi
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: bodhi
+      service: consumer
+    name: bodhi-consumer
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-consumer
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: bodhi-consumer
+          deploymentconfig: bodhi-consumer
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-consumer@sha256:835653af4e6d1a800c3fbd13f64ded94e607984a149b26e1e15f7ab522dfa188
+          imagePullPolicy: Always
+          name: bodhi-consumer
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-consumer
+        from:
+          kind: ImageStreamTag
+          name: bodhi-consumer:latest
+          namespace: bodhi
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: bodhi
+      service: web
+    name: bodhi-web
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: bodhi-web
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: bodhi-web
+          deploymentconfig: bodhi-web
+      spec:
+        containers:
+        - image: docker-registry.default.svc:5000/bodhi/bodhi-web@sha256:e3fc48ca9f3cdb16b761b7d85b936ef7ff0187c29cc9fff31f8ff3005c4d7238
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: bodhi-web
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/keytabs
+            name: keytab-volume
+            readOnly: true
+          - mountPath: /httpdir
+            name: httpdir-volume
+          - mountPath: /etc/fedora-messaging
+            name: fedora-messaging-config-volume
+            readOnly: true
+          - mountPath: /etc/pki/fedora-messaging/cacert.pem
+            name: fedora-messaging-ca-volume
+            readOnly: true
+            subPath: cacert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-cert.pem
+            name: fedora-messaging-crt-volume
+            readOnly: true
+            subPath: bodhi-cert.pem
+          - mountPath: /etc/pki/fedora-messaging/bodhi-key.pem
+            name: fedora-messaging-key-volume
+            readOnly: true
+            subPath: bodhi-key.pem
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: bodhi-configmap
+          name: config-volume
+        - name: keytab-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-keytab
+        - emptyDir: {}
+          name: httpdir-volume
+        - configMap:
+            defaultMode: 420
+            name: fedora-messaging-configmap
+          name: fedora-messaging-config-volume
+        - name: fedora-messaging-ca-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-ca
+        - name: fedora-messaging-crt-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-crt
+        - name: fedora-messaging-key-volume
+          secret:
+            defaultMode: 420
+            secretName: bodhi-fedora-messaging-key
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - bodhi-web
+        from:
+          kind: ImageStreamTag
+          name: bodhi-web:latest
+          namespace: bodhi
+      type: ImageChange
+    - type: ConfigChange
