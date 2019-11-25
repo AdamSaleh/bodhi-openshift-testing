@@ -18,21 +18,23 @@ let defaultMounts =
           , readOnly = Some True
           }
       ,   defaults.VolumeMount
-        ⫽ { mountPath = "/srv/bodhi/development.ini"
-          , name = "config-ini-volume"
-          , readOnly = Some True
-          , subPath = Some "development.ini"
+        ⫽ { mountPath = "/httpdir"
+          , name = "httpdir-volume"
           }
       ]
 
 let defaultVolumes =
       [   defaults.Volume
-        ⫽ { configMap = Some { defaultMode = 420, name = "bodhi-configmap" }
+        ⫽ { configMap = Some { defaultMode = 365, name = "bodhi-configmap" }
           , name = "config-volume"
           }
       ,   defaults.Volume
-        ⫽ { configMap = Some { defaultMode = 420, name = "bodhi-dev-ini" }
+        ⫽ { configMap = Some { defaultMode = 365, name = "bodhi-dev-ini" }
           , name = "config-ini-volume"
+          }
+      , defaults.Volume
+       // { name = "httpdir-volume"
+          , emptyDir = Some {=}
           }
       ]
 
@@ -54,7 +56,7 @@ in  { apiVersion =
           , name = "NAMESPACE"
           , value = "asaleh-test"
           }
-          , { description = "Domain to serve apps on"
+        , { description = "Domain to serve apps on"
           , name = "APPDOMAIN"
           , value = "app.os.stg.fedoraproject.org"
           }
@@ -337,11 +339,8 @@ in  { apiVersion =
                                 ⫽ { image =
                                       "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
                                   , imagePullPolicy = "Always"
-                                  , command = [ "/usr/bin/pserve-3" ]
-                                  , args =
-                                      [ "/srv/bodhi/development.ini"
-                                      , "--reload"
-                                      ]
+                                  , command = [ "sh" ]
+                                  , args = ["/etc/bodhi/start.sh"]
                                   , livenessProbe =
                                       Some
                                         (   defaults.Probe
@@ -446,15 +445,12 @@ in  { apiVersion =
                 [ { mapKey = "celeryconfig.py"
                   , mapValue = ./files/celeryconfig.py as Text
                   }
-                ]
-            }
-        , templateObjectTypes.ConfigMap
-            { apiVersion = "v1"
-            , kind = "ConfigMap"
-            , metadata = { name = "bodhi-dev-ini" }
-            , data =
-                [ { mapKey = "development.ini"
-                  , mapValue = ./files/development.ini as Text
+                , { mapKey = "start.sh", mapValue = ./files/start.sh as Text }
+                , { mapKey = "httpd.conf"
+                  , mapValue = ./files/httpd.conf as Text
+                  }
+                , { mapKey = "production.ini"
+                  , mapValue = ./files/production.ini as Text
                   }
                 ]
             }
@@ -463,8 +459,8 @@ in  { apiVersion =
             , kind = "ConfigMap"
             , metadata = { name = "bodhi-dev-ini" }
             , data =
-                [ { mapKey = "development.ini"
-                  , mapValue = ./files/development.ini as Text
+                [ { mapKey = "production.ini"
+                  , mapValue = ./files/production.ini as Text
                   }
                 ]
             }
