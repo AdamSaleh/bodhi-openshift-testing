@@ -51,8 +51,12 @@ in  { apiVersion =
     , metadata = { name = "bodhi-template" }
     , parameters =
         [ { description = "Namespace, mostly for image building"
-          , generate = "expression"
           , name = "NAMESPACE"
+          , value = "asaleh-test"
+          }
+          , { description = "Domain to serve apps on"
+          , name = "APPDOMAIN"
+          , value = "app.os.stg.fedoraproject.org"
           }
         ]
     , objects =
@@ -81,7 +85,7 @@ in  { apiVersion =
             , kind = "Service"
             , metadata =
                 { labels = { app = "bodhi", service = "postgres" }
-                , name = "bodhi-web"
+                , name = "postgres"
                 }
             , spec =
                 { ports =
@@ -463,6 +467,21 @@ in  { apiVersion =
                   , mapValue = ./files/development.ini as Text
                   }
                 ]
+            }
+        , templateObjectTypes.Route
+            { apiVersion = "route.openshift.io/v1"
+            , kind = "Route"
+            , metadata =
+                { labels = { app = "bodhi", service = "web" }
+                , name = "bodhi-web"
+                }
+            , spec =
+                { host = "bodhi-web-\${NAMESPACE}.\${APPDOMAIN}"
+                , port = { targetPort = "web" }
+                , tls = { termination = "edge" }
+                , to = { kind = "Service", name = "bodhi-web", weight = 100 }
+                , wildcardPolicy = Some "None"
+                }
             }
         ]
     }
