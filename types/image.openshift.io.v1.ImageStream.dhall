@@ -1,3 +1,4 @@
+{ Type =
 { apiVersion : Text
 , kind : Text
 , metadata : { name : Text }
@@ -11,4 +12,8 @@
           , referencePolicy : { type : Text }
           }
     }
+}
+, default = {apiVersion =
+                "image.openshift.io/v1"
+            , kind = "ImageStream"}
 }

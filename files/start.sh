@@ -1,4 +1,4 @@
-mkdir /httpdir/run
+mkdir -p /httpdir/run
 ln -s /etc/httpd/modules /httpdir/modules
 truncate --size=0 /httpdir/accesslog /httpdir/errorlog
 tail -qf /httpdir/accesslog /httpdir/errorlog &

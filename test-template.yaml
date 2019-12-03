@@ -15,7 +15,11 @@ objects:
     - name: web
       port: 8080
       protocol: TCP
-      targetPort: 6543
+      targetPort: 8000
+    - name: admin
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
     selector:
       deploymentconfig: bodhi-web
     sessionAffinity: None
@@ -95,8 +99,8 @@ objects:
             exec:
               command:
               - /usr/libexec/check-container
-            failureThreshold: 3
-            initialDelaySeconds: 30
+            failureThreshold: 5
+            initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
@@ -133,12 +137,6 @@ objects:
       recreateParams:
         timeoutSeconds: 600
       resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
       type: Rolling
     template:
       metadata:
@@ -169,10 +167,8 @@ objects:
           - mountPath: /etc/bodhi
             name: config-volume
             readOnly: true
-          - mountPath: /srv/bodhi/development.ini
-            name: config-ini-volume
-            readOnly: true
-            subPath: development.ini
+          - mountPath: /httpdir
+            name: httpdir-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -180,13 +176,11 @@ objects:
         terminationGracePeriodSeconds: 30
         volumes:
         - configMap:
-            defaultMode: 420
+            defaultMode: 365
             name: bodhi-configmap
           name: config-volume
-        - configMap:
-            defaultMode: 420
-            name: bodhi-dev-ini
-          name: config-ini-volume
+        - emptyDir: {}
+          name: httpdir-volume
     test: false
     triggers:
     - imageChangeParams:
@@ -216,12 +210,6 @@ objects:
       recreateParams:
         timeoutSeconds: 600
       resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
       type: Rolling
     template:
       metadata:
@@ -246,10 +234,8 @@ objects:
           - mountPath: /etc/bodhi
             name: config-volume
             readOnly: true
-          - mountPath: /srv/bodhi/development.ini
-            name: config-ini-volume
-            readOnly: true
-            subPath: development.ini
+          - mountPath: /httpdir
+            name: httpdir-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -257,13 +243,11 @@ objects:
         terminationGracePeriodSeconds: 30
         volumes:
         - configMap:
-            defaultMode: 420
+            defaultMode: 365
             name: bodhi-configmap
           name: config-volume
-        - configMap:
-            defaultMode: 420
-            name: bodhi-dev-ini
-          name: config-ini-volume
+        - emptyDir: {}
+          name: httpdir-volume
     test: false
     triggers:
     - imageChangeParams:
@@ -308,7 +292,7 @@ objects:
       spec:
         containers:
         - args:
-          - /srv/bodhi/development.ini
+          - /etc/bodhi/production.ini
           - --reload
           command:
           - /usr/bin/pserve-3
@@ -346,10 +330,54 @@ objects:
           - mountPath: /etc/bodhi
             name: config-volume
             readOnly: true
-          - mountPath: /srv/bodhi/development.ini
-            name: config-ini-volume
+          - mountPath: /httpdir
+            name: httpdir-volume
+        - args:
+          - /etc/bodhi/start.sh
+          command:
+          - sh
+          env: []
+          image: docker-registry.default.svc:5000/${NAMESPACE}/bodhi-base:latest
+          imagePullPolicy: Always
+          name: bodhi-static
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
             readOnly: true
-            subPath: development.ini
+          - mountPath: /httpdir
+            name: httpdir-volume
+        - args:
+          - -c
+          - /etc/bodhi/envoy.yaml
+          - --v2-config-only
+          - --service-cluster
+          - bodhi-envoy
+          command:
+          - /usr/local/bin/envoy
+          env: []
+          image: registry.hub.docker.com/envoyproxy/envoy-alpine:v1.8.0
+          imagePullPolicy: Always
+          name: bodhi-envoy
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          - containerPort: 8001
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/bodhi
+            name: config-volume
+            readOnly: true
+          - mountPath: /httpdir
+            name: httpdir-volume
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -357,13 +385,11 @@ objects:
         terminationGracePeriodSeconds: 30
         volumes:
         - configMap:
-            defaultMode: 420
+            defaultMode: 365
             name: bodhi-configmap
           name: config-volume
-        - configMap:
-            defaultMode: 420
-            name: bodhi-dev-ini
-          name: config-ini-volume
+        - emptyDir: {}
+          name: httpdir-volume
     test: false
     triggers:
     - imageChangeParams:
@@ -427,6 +453,7 @@ objects:
             python3-pyramid             \
             python3-pyramid-fas-openid  \
             python3-pyramid-mako        \
+            python3-pyramid_sawing      \
             python3-bugzilla            \
             python3-fedora              \
             python3-pyyaml              \
@@ -499,17 +526,127 @@ objects:
           # that have a Koji mount.
           'compose': {'queue': 'has_koji_mount'},
       }
-  kind: ConfigMap
-  metadata:
-    name: bodhi-configmap
-- apiVersion: v1
-  data:
-    development.ini: |
+    envoy.yaml: |
+      admin:
+        access_log_path: /dev/null
+        address:
+          socket_address: { address: 0.0.0.0, port_value: 8001 }
+      static_resources:
+        listeners:
+        - name: ingress_http
+          address:
+            socket_address: { address: 0.0.0.0, port_value: 8000 }
+          filter_chains:
+          - filters:
+            - name: envoy.http_connection_manager
+              config:
+                stat_prefix: ingress_http
+                codec_type: auto
+                access_log:
+                - name: envoy.file_access_log
+                  config:
+                    path: /dev/null
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                  - name: webxp-api_http
+                    domains: ["*"]
+                    routes:
+                    - match: { prefix: "/static/v5.0" }
+                      route: { cluster: bodhi_static }
+                    - match: { prefix: "/"}
+                      route: { cluster: bodhi_web }
+                    
+                http_filters:
+                - name: envoy.router
+        clusters:
+        - name: bodhi_web
+          connect_timeout: 0.25s
+          type: static
+          lb_policy: round_robin
+          hosts:
+          - socket_address: { address: 127.0.0.1, port_value: 6543 }
+        - name: bodhi_static
+          connect_timeout: 0.25s
+          type: static
+          lb_policy: round_robin
+          hosts:
+          - socket_address: { address: 127.0.0.1, port_value: 8080 }
+    httpd.conf: |
+      Listen 0.0.0.0:8080
+      ServerRoot "/httpdir"
+      PidFile "/httpdir/httpd.pid"
+      LoadModule authn_file_module modules/mod_authn_file.so
+      LoadModule authn_anon_module modules/mod_authn_anon.so
+      LoadModule authz_user_module modules/mod_authz_user.so
+      LoadModule authz_host_module modules/mod_authz_host.so
+      LoadModule include_module modules/mod_include.so
+      LoadModule log_config_module modules/mod_log_config.so
+      LoadModule env_module modules/mod_env.so
+      LoadModule ext_filter_module modules/mod_ext_filter.so
+      LoadModule expires_module modules/mod_expires.so
+      LoadModule headers_module modules/mod_headers.so
+      LoadModule mime_module modules/mod_mime.so
+      LoadModule status_module modules/mod_status.so
+      LoadModule negotiation_module modules/mod_negotiation.so
+      LoadModule dir_module modules/mod_dir.so
+      LoadModule alias_module modules/mod_alias.so
+      LoadModule rewrite_module modules/mod_rewrite.so
+      LoadModule version_module modules/mod_version.so
+      LoadModule wsgi_module modules/mod_wsgi_python3.so
+      LoadModule authn_core_module modules/mod_authn_core.so
+      LoadModule authz_core_module modules/mod_authz_core.so
+      LoadModule unixd_module modules/mod_unixd.so
+      LoadModule mpm_event_module modules/mod_mpm_event.so
+      StartServers  20
+      ServerLimit   100
+      MaxRequestsPerChild 2000
+      MaxRequestWorkers 100
+      <Directory "/usr/share/doc/bodhi-docs/html/">
+          AllowOverride None
+          Require all granted
+      </Directory>
+      <Directory "/srv/bodhi/server/static/">
+          AllowOverride None
+          Require all granted
+      </Directory>
+      <Location />
+          Require all granted
+      </Location>
+      <Location /docs/>
+          Header set Cache-Control public
+          ExpiresDefault "access plus 1 month"
+          Header unset ETag
+      </Location>
+      <Location /static/>
+          Header set Cache-Control public
+          ExpiresDefault "access plus 1 month"
+          Header unset ETag
+      </Location>
+      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+      CustomLog /httpdir/accesslog combined
+      ErrorLog /httpdir/errorlog
+      LogLevel debug
+      TypesConfig /etc/mime.types
+      AddDefaultCharset UTF-8
+      CoreDumpDirectory /tmp
+      Alias /docs /usr/share/doc/bodhi-docs/html/
+      Alias /static/v5.0.0 /srv/bodhi/bodhi/server/static/
+      WSGIApplicationGroup %{GLOBAL}
+      WSGISocketPrefix run/wsgi
+      WSGIRestrictStdout Off
+      WSGIRestrictSignal Off
+      WSGIPythonOptimize 1
+    production.ini: |
+      [filter:proxy-prefix]
+      use = egg:PasteDeploy#prefix
+      prefix = /
+      scheme = https
       # See production.ini for documentation on the settings that can be used in this file.
       [app:main]
       use = egg:bodhi-server
       badge_ids = binary-star|both-bull-and-self-transcended-tester-viii|catching-the-bull-tester-iv|corporate-drone|corporate-overlord|corporate-shill|discovery-of-the-footprints-tester-ii|in-search-of-the-bull-tester-i|is-this-thing-on-updates-testing-i|is-this-thing-on-updates-testing-ii|is-this-thing-on-updates-testing-iii|is-this-thing-on-updates-testing-iv|it-still-works!|like-a-rock-updates-stable-i|like-a-rock-updates-stable-ii|like-a-rock-updates-stable-iii|like-a-rock-updates-stable-iv|mic-check!-updates-testing-v|missed-the-train|override,-you-say|perceiving-the-bull-tester-iii|reaching-the-source-tester-ix|return-to-society-tester-x|riding-the-bull-home-tester-vi|stop-that-update!|take-this-and-call-me-in-the-morning|taming-the-bull-tester-v|tectonic!-updates-stable-v|the-bull-transcended-tester-vii|what-goes-around-comes-around-karma-i|what-goes-around-comes-around-karma-ii|what-goes-around-comes-around-karma-iii|what-goes-around-comes-around-karma-iv|white-hat|you-can-pry-it-from-my-cold,-dead-hands
-      base_address = http://localhost:6543/
+      base_address = https://bodhi-web-asaleh-test.app.os.stg.fedoraproject.org/
       fedora_announce_list = package-announce@lists.fedoraproject.org
       fedora_test_announce_list = test@lists.fedoraproject.org
       fedora_epel_announce_list = epel-package-announce@lists.fedoraproject.org
@@ -523,8 +660,8 @@ objects:
       f7.post_beta.critpath.num_admin_approvals = 0
       f7.post_beta.critpath.min_karma = 2
       cors_origins_ro = *
-      cors_origins_rw = http://0.0.0.0:6543
-      cors_connect_src = http://0.0.0.0:6543 http://localhost:6543 https://*.fedoraproject.org/ wss://hub.fedoraproject.org:9939/
+      cors_origins_rw = https://bodhi-web-asaleh-test.app.os.stg.fedoraproject.org/
+      cors_connect_src = http://0.0.0.0:6543 http://localhost:6543 https://*.app.os.stg.fedoraproject.org/ wss://hub.fedoraproject.org:9939/
       pyramid.reload_templates = true
       pyramid.debug_authorization = true
       pyramid.debug_notfound = true
@@ -604,7 +741,7 @@ objects:
       keys = generic
 
       [logger_root]
-      level = INFO
+      level = DEBUG
       handlers = console
 
       [logger_bodhi]
@@ -641,17 +778,27 @@ objects:
 
       [formatter_generic]
       format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
+    start.sh: |
+      mkdir -p /httpdir/run
+      ln -s /etc/httpd/modules /httpdir/modules
+      truncate --size=0 /httpdir/accesslog /httpdir/errorlog
+      tail -qf /httpdir/accesslog /httpdir/errorlog &
+      exec httpd -f /etc/bodhi/httpd.conf -DFOREGROUND -DNO_DETACH
   kind: ConfigMap
   metadata:
-    name: bodhi-dev-ini
+    name: bodhi-configmap
 - apiVersion: v1
   data:
-    development.ini: |
+    production.ini: |
+      [filter:proxy-prefix]
+      use = egg:PasteDeploy#prefix
+      prefix = /
+      scheme = https
       # See production.ini for documentation on the settings that can be used in this file.
       [app:main]
       use = egg:bodhi-server
       badge_ids = binary-star|both-bull-and-self-transcended-tester-viii|catching-the-bull-tester-iv|corporate-drone|corporate-overlord|corporate-shill|discovery-of-the-footprints-tester-ii|in-search-of-the-bull-tester-i|is-this-thing-on-updates-testing-i|is-this-thing-on-updates-testing-ii|is-this-thing-on-updates-testing-iii|is-this-thing-on-updates-testing-iv|it-still-works!|like-a-rock-updates-stable-i|like-a-rock-updates-stable-ii|like-a-rock-updates-stable-iii|like-a-rock-updates-stable-iv|mic-check!-updates-testing-v|missed-the-train|override,-you-say|perceiving-the-bull-tester-iii|reaching-the-source-tester-ix|return-to-society-tester-x|riding-the-bull-home-tester-vi|stop-that-update!|take-this-and-call-me-in-the-morning|taming-the-bull-tester-v|tectonic!-updates-stable-v|the-bull-transcended-tester-vii|what-goes-around-comes-around-karma-i|what-goes-around-comes-around-karma-ii|what-goes-around-comes-around-karma-iii|what-goes-around-comes-around-karma-iv|white-hat|you-can-pry-it-from-my-cold,-dead-hands
-      base_address = http://localhost:6543/
+      base_address = https://bodhi-web-asaleh-test.app.os.stg.fedoraproject.org/
       fedora_announce_list = package-announce@lists.fedoraproject.org
       fedora_test_announce_list = test@lists.fedoraproject.org
       fedora_epel_announce_list = epel-package-announce@lists.fedoraproject.org
@@ -665,8 +812,8 @@ objects:
       f7.post_beta.critpath.num_admin_approvals = 0
       f7.post_beta.critpath.min_karma = 2
       cors_origins_ro = *
-      cors_origins_rw = http://0.0.0.0:6543
-      cors_connect_src = http://0.0.0.0:6543 http://localhost:6543 https://*.fedoraproject.org/ wss://hub.fedoraproject.org:9939/
+      cors_origins_rw = https://bodhi-web-asaleh-test.app.os.stg.fedoraproject.org/
+      cors_connect_src = http://0.0.0.0:6543 http://localhost:6543 https://*.app.os.stg.fedoraproject.org/ wss://hub.fedoraproject.org:9939/
       pyramid.reload_templates = true
       pyramid.debug_authorization = true
       pyramid.debug_notfound = true
@@ -746,7 +893,7 @@ objects:
       keys = generic
 
       [logger_root]
-      level = INFO
+      level = DEBUG
       handlers = console
 
       [logger_bodhi]
