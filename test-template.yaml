@@ -727,6 +727,11 @@ objects:
       host = 0.0.0.0
       port = 6543
 
+      trusted_proxy = 127.0.0.1
+      trusted_proxy_count = 1
+      trusted_proxy_headers = x-forwarded-for x-forwarded-host x-forwarded-proto x-forwarded-port
+      clear_untrusted_proxy_headers = yes
+
       [pshell]
       m = bodhi.server.models
       s = bodhi.server.Session
@@ -878,6 +883,11 @@ objects:
       use = egg:waitress#main
       host = 0.0.0.0
       port = 6543
+
+      trusted_proxy = 127.0.0.1
+      trusted_proxy_count = 1
+      trusted_proxy_headers = x-forwarded-for x-forwarded-host x-forwarded-proto x-forwarded-port
+      clear_untrusted_proxy_headers = yes
 
       [pshell]
       m = bodhi.server.models

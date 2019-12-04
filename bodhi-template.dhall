@@ -384,6 +384,15 @@ in  { apiVersion =
                                     }
                               , volumeMounts = defaultMounts
                               }
+                            {-,  schema.Container::{
+                              , image =
+                                  "registry.hub.docker.com/library/rabbitmq:3.8.2"
+                              , imagePullPolicy = "Always"
+                              , name = "rabbit"
+                              , ports =
+                                  [ { containerPort = 8080, protocol = "TCP" } ]
+                              , volumeMounts = defaultMounts
+                              -}
                             , schema.Container::{
                               , image =
                                   "docker-registry.default.svc:5000/\${NAMESPACE}/bodhi-base:latest"
